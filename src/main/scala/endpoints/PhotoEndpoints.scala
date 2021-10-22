@@ -15,6 +15,7 @@ import tofu.generate.GenUUID
 import tofu.syntax.feither._
 import tofu.syntax.monadic._
 import cats.syntax.traverse._
+import common.Config
 import sttp.tapir.codec.newtype.codecForNewType
 
 import java.nio.file.{Path, Paths, StandardOpenOption}
@@ -22,9 +23,9 @@ import java.util.UUID
 
 
 final class PhotoEndpoints[F[_]: Monad: PhotoStorage: SubmissionStorage: UserPhotoStorage: Sync: ContextShift: GenUUID]
-    (baseEndpoints: BaseEndpoints[F], blocker: Blocker) extends EndpointsModule[F] {
+    (baseEndpoints: BaseEndpoints[F], blocker: Blocker, config: Config) extends EndpointsModule[F] {
 
-    val pathPrefix = "./photo/"
+    val pathPrefix = config.photoFolder
 
     val allSumbissions =
       baseEndpoints

@@ -6,7 +6,7 @@ import pureconfig.module.catseffect.syntax._
 import pureconfig.generic.auto._
 import distage._
 
-case class Config(dbConnectionString: String, dbUser: String, dbPass: String, serverPort: Int)
+case class Config(dbConnectionString: String, dbUser: String, dbPass: String, serverPort: Int, photoFolder: String)
 
 object Config {
 
