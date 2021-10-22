@@ -59,14 +59,17 @@ object SubmissionStorage extends LoggingCompanion[SubmissionStorage] {
         userId: UUID,
         metadata: Submission
     ): ConnectionIO[Unit] =
-      lsql"""INSERT INTO submission(photo_id, user_id, name) VALUES(
+      lsql"""INSERT INTO submission(photo_id, user_id, latitude, longitude, name, photoYear) VALUES(
             |$photoId,
             |$userId,
-            |${metadata.name}
+            |${metadata.position.map(_.latitude)},
+            |${metadata.position.map(_.longitude)},
+            |${metadata.name},
+            |${metadata.photoYear}
             |) ON CONFLICT (photo_id, user_id) DO UPDATE SET name = ${metadata.name}""".stripMargin.update.run.void
 
     def find(photoId: Int, userId: UUID): ConnectionIO[Option[Submission]] =
-      lsql"""SELECT name
+      lsql"""SELECT latitude, longitude, name, photoYear
             |FROM submission
             |WHERE photo_id = $photoId AND user_id = $userId
             |""".stripMargin
@@ -74,7 +77,7 @@ object SubmissionStorage extends LoggingCompanion[SubmissionStorage] {
         .option
 
     def findAllForPhoto(photoId: Int): ConnectionIO[List[UserSubmission]] =
-      lsql"""SELECT user_id, username, u_role, name
+      lsql"""SELECT user_id, username, u_role, latitude, longitude, name, photoYear
             |FROM submission
             |JOIN users
             |ON user_id = users.id
@@ -84,7 +87,7 @@ object SubmissionStorage extends LoggingCompanion[SubmissionStorage] {
         .to[List]
 
     def findAllForUser(userId: UUID): ConnectionIO[List[PhotoSubmission]] =
-      lsql"""SELECT photo_id, name
+      lsql"""SELECT photo_id, latitude, longitude, name, photoYear
             |FROM submission
             |JOIN photo
             |ON photo_id = photo.id

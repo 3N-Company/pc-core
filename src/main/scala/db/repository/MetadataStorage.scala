@@ -53,13 +53,21 @@ object MetadataStorage extends LoggingCompanion[MetadataStorage] {
         photoId: Int,
         metadata: Submission
     ): ConnectionIO[Unit] =
-      lsql"""INSERT INTO metadata(photo_id, name) VALUES(
+      lsql"""INSERT INTO metadata(photo_id, latitude, longitude, name, photoYear) VALUES(
                   |$photoId,
+                  |${metadata.position.map(_.latitude)}
+                  |${metadata.position.map(_.longitude)}
                   |${metadata.name}
-                  |) ON CONFLICT (photo_id) DO UPDATE SET name = ${metadata.name}""".stripMargin.update.run.void
+                  |) ON CONFLICT (photo_id) DO
+                  | UPDATE SET
+                  |  latitude = ${metadata.position.map(_.latitude)},
+                  |  longitude = ${metadata.position.map(_.longitude)}
+                  |  name = ${metadata.name},
+                  |  photoYear = ${metadata.photoYear}
+                  |  """.stripMargin.update.run.void
 
     def find(photoId: Int): ConnectionIO[Option[Submission]] =
-      lsql"""SELECT name
+      lsql"""SELECT latitude, longitude, name, photoYear
                   |FROM metadata
                   |WHERE photo_id = $photoId
                   |""".stripMargin
