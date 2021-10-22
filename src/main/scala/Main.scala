@@ -42,7 +42,7 @@ object Main extends IOApp{
       routes = Http4sServerInterpreter[IO].toRoutes(serverEndpoints)
       _ <- BlazeServerBuilder[IO](ec)
         .withHttpApp(Router("/" -> routes, "/api" -> swagger.routes[IO]).orNotFound)
-        .bindHttp(config.serverPort, "localhost")
+        .bindLocal(config.serverPort)
         .serve
         .compile
         .drain
