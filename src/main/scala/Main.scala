@@ -41,6 +41,7 @@ object Main extends IOApp{
       swagger = new SwaggerHttp4s(openapiYaml)
       routes = Http4sServerInterpreter[IO].toRoutes(serverEndpoints)
       _ <- BlazeServerBuilder[IO](ec)
+        .enableHttp2(true)
         .withHttpApp(Router("/" -> routes, "/api" -> swagger.routes[IO]).orNotFound)
         .bindHttp(config.serverPort, "0.0.0.0")
         .serve
