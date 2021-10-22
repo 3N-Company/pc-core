@@ -1,14 +1,5 @@
 import cats.Monad
-import cats.effect.{
-  Blocker,
-  ConcurrentEffect,
-  ContextShift,
-  Effect,
-  ExitCode,
-  IO,
-  IOApp,
-  Sync
-}
+import cats.effect.{Blocker, ConcurrentEffect, ContextShift, Effect, ExitCode, IO, IOApp, Sync}
 import common.Config
 import db.{DB, Migrator}
 import distage._
@@ -27,6 +18,7 @@ import sttp.tapir.openapi.circe.yaml._
 import sttp.tapir.swagger.http4s.SwaggerHttp4s
 import cats.syntax.traverse._
 import db.models.Credentials
+import org.http4s.server.middleware.CORS
 import tofu.syntax.monadic._
 
 import scala.concurrent.ExecutionContext
@@ -48,10 +40,11 @@ object Main extends IOApp {
         .toYaml
       swagger = new SwaggerHttp4s(openapiYaml)
       routes = Http4sServerInterpreter[IO].toRoutes(serverEndpoints)
+      corsRoutes = CORS(routes)
       _ <- BlazeServerBuilder[IO](ec)
         .enableHttp2(true)
         .withHttpApp(
-          Router("/" -> routes, "/api" -> swagger.routes[IO]).orNotFound
+          Router("/" -> corsRoutes, "/api" -> swagger.routes[IO]).orNotFound
         )
         .bindHttp(config.serverPort, "0.0.0.0")
         .serve
