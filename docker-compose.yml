@@ -14,7 +14,7 @@ services:
       DB-USER: "postgres"
       DB-PASS: "secretpassword"
       SERVER-PORT: 8080
-      PHOTO-FOLDER: "/data/photo"
+      PHOTO-FOLDER: "/data"
     ports:
       - "8080:8080"
     volumes:

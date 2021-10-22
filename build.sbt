@@ -23,4 +23,6 @@ dockerBaseImage := "adoptopenjdk:11-jre-hotspot"
 
 dockerExposedPorts := Seq(8080)
 
+dockerExposedVolumes ++= Seq("/data")
+
 dockerUpdateLatest := true
