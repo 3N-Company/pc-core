@@ -38,14 +38,27 @@ object Dependencies {
     private val version = "0.18.3"
 
     val core = "com.softwaremill.sttp.tapir" %% "tapir-core" % version
-    val jsonCirce = "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % version
-    val tapirHttp4s = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % version
+    val jsonCirce =
+      "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % version
+    val tapirHttp4s =
+      "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % version
     val derevo = "com.softwaremill.sttp.tapir" %% "tapir-derevo" % version
-    val openapiDocs = "com.softwaremill.sttp.tapir" %% "tapir-openapi-docs" % version
-    val openapiCirceYaml = "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe-yaml" % version
-    val tapirSwagger = "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-http4s" % version
+    val openapiDocs =
+      "com.softwaremill.sttp.tapir" %% "tapir-openapi-docs" % version
+    val openapiCirceYaml =
+      "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe-yaml" % version
+    val tapirSwagger =
+      "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-http4s" % version
 
-    val all = Seq(core, jsonCirce, tapirHttp4s, derevo, openapiDocs, openapiCirceYaml, tapirSwagger)
+    val all = Seq(
+      core,
+      jsonCirce,
+      tapirHttp4s,
+      derevo,
+      openapiDocs,
+      openapiCirceYaml,
+      tapirSwagger
+    )
   }
 
   object FS2 {
@@ -69,7 +82,8 @@ object Dependencies {
     private val version = "0.13.0"
 
     val pureconfig = "com.github.pureconfig" %% "pureconfig" % version
-    val catsEffectInterop = "com.github.pureconfig" %% "pureconfig-cats-effect" % version
+    val catsEffectInterop =
+      "com.github.pureconfig" %% "pureconfig-cats-effect" % version
 
     val all = Seq(pureconfig, catsEffectInterop)
   }
@@ -88,6 +102,7 @@ object Dependencies {
     val all = Seq(flywayCore)
   }
 
-  val all: Seq[ModuleID] = Doobie.all ++ Postgres.all ++ Tofu.all ++ Tapir.all ++ Derevo.all ++
-    Izumi.all ++ Pureconfig.all ++ Http4s.all ++ Flyway.all
+  val all: Seq[ModuleID] =
+    Doobie.all ++ Postgres.all ++ Tofu.all ++ Tapir.all ++ Derevo.all ++
+      Izumi.all ++ Pureconfig.all ++ Http4s.all ++ Flyway.all
 }

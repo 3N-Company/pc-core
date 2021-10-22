@@ -32,5 +32,3 @@ object ScalaOpts {
   )
 
 }
-
-

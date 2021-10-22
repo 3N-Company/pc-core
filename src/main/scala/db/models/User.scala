@@ -14,14 +14,12 @@ import java.util.UUID
 @derive(loggable)
 sealed trait Role
 
-
 object Role {
   @derive(loggable)
   case object Plain extends Role
 
   @derive(loggable)
   case object Admin extends Role
-
 
   def toEnum(r: Role): String = r match {
     case Plain => "plain"
@@ -47,19 +45,17 @@ object Role {
     Decoder[String].emap(s => fromEnum(s).toRight(s"Role $s does not exist"))
 
   implicit val roleSchema: Schema[Role] =
-    Schema.string[Role].validate{
+    Schema.string[Role].validate {
       Validator.enumeration(List(Plain, Admin), (r: Role) => Some(toEnum(r)))
     }
 
 }
 
+@derive(loggable, encoder, decoder, schema)
+case class Credentials(
+    username: String,
+    @masked(MaskMode.Erase) password: String
+)
 
 @derive(loggable, encoder, decoder, schema)
-case class Credentials(username: String, @masked(MaskMode.Erase) password: String)
-
-
-@derive(loggable, encoder, decoder, schema)
-case class User (id: UUID, username: String,  role: Role)
-
-
-
+case class User(id: UUID, username: String, role: Role)

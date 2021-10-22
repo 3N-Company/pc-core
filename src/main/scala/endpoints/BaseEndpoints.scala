@@ -15,8 +15,12 @@ import tofu.syntax.feither
 import java.util.UUID
 
 trait BaseEndpoints[F[_]] {
-  def secureEndpoint: PartialServerEndpoint[Option[String], (UUID, String), Unit, StatusCode, Unit, Any, F]
-  def adminEndpoint: PartialServerEndpoint[Option[String], UUID, Unit, StatusCode, Unit, Any, F]
+  def secureEndpoint: PartialServerEndpoint[Option[
+    String
+  ], (UUID, String), Unit, StatusCode, Unit, Any, F]
+  def adminEndpoint: PartialServerEndpoint[Option[
+    String
+  ], UUID, Unit, StatusCode, Unit, Any, F]
 }
 
 object BaseEndpoints {
@@ -25,20 +29,19 @@ object BaseEndpoints {
 
   val authCookie = "JSESSIONID"
 
-
   final class Impl[F[_]: SessionStorage: Monad] extends BaseEndpoints[F] {
-
 
     val secureEndpoint =
       endpoint
         .in(auth.apiKey(cookie[Option[String]](authCookie)))
         .errorOut(statusCode)
-        .serverLogicForCurrent[(UUID, String), F]( c =>
+        .serverLogicForCurrent[(UUID, String), F](c =>
           c.toRight(StatusCode.Unauthorized)
-            .map(cookie => SessionStorage[F].getUserId(cookie).mapIn((_, cookie)))
+            .map(cookie =>
+              SessionStorage[F].getUserId(cookie).mapIn((_, cookie))
+            )
             .flatTraverse(_.map(_.toRight(StatusCode.Unauthorized)))
         )
-
 
     val adminEndpoint =
       endpoint
@@ -48,13 +51,12 @@ object BaseEndpoints {
           c.toRight(StatusCode.Unauthorized)
             .map(SessionStorage[F].getUser)
             .flatTraverse(_.map(_.toRight(StatusCode.Unauthorized)))
-            .flatMapIn{
+            .flatMapIn {
               case User(id, _, Role.Admin) => Right(id)
-              case _ => Left(StatusCode.Forbidden)
+              case _                       => Left(StatusCode.Forbidden)
             }
         )
 
   }
-
 
 }

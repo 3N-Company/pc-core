@@ -33,14 +33,21 @@ object UserStorage extends LoggingCompanion[UserStorage] {
 
   def apply[F[_]: UserStorage]: UserStorage[F] = implicitly
 
-  final class Make[F[_]: Apply, DB[_]: Monad: LiftConnectionIO: EmbeddableLogHandler: Logging.Make: Tries](txr: Txr[F, DB]) extends Lifecycle.Of[Identity[*], UserStorage[F]](
-    Lifecycle.pure(make[F, DB](txr))
-  )
+  final class Make[F[_]: Apply, DB[
+      _
+  ]: Monad: LiftConnectionIO: EmbeddableLogHandler: Logging.Make: Tries](
+      txr: Txr[F, DB]
+  ) extends Lifecycle.Of[Identity[*], UserStorage[F]](
+        Lifecycle.pure(make[F, DB](txr))
+      )
 
-
-
-  def make[F[_]: Apply, DB[_]: Monad: LiftConnectionIO: EmbeddableLogHandler: Logging.Make: Tries](txr: Txr[F, DB]): UserStorage[F] =  {
-    val sql = EmbeddableLogHandler[DB].embedLift(implicit lh => new Impl).attachErrLogs
+  def make[F[_]: Apply, DB[
+      _
+  ]: Monad: LiftConnectionIO: EmbeddableLogHandler: Logging.Make: Tries](
+      txr: Txr[F, DB]
+  ): UserStorage[F] = {
+    val sql =
+      EmbeddableLogHandler[DB].embedLift(implicit lh => new Impl).attachErrLogs
     val tx = txr.trans
     sql.mapK(tx)
   }
@@ -51,17 +58,14 @@ object UserStorage extends LoggingCompanion[UserStorage] {
       lsql"""INSERT INTO users (username, password) VALUES (
             |  ${credentials.username},
             |  crypt(${credentials.password}, gen_salt('bf'))
-            |)"""
-        .stripMargin
-        .update
+            |)""".stripMargin.update
         .withUniqueGeneratedKeys[UUID]("id")
 
     def findId(credentials: Credentials): ConnectionIO[Option[UUID]] =
       lsql"""SELECT id
             |  FROM users
             | WHERE username = ${credentials.username}
-            |   AND password = crypt(${credentials.password}, password)"""
-        .stripMargin
+            |   AND password = crypt(${credentials.password}, password)""".stripMargin
         .query[UUID]
         .option
 
@@ -69,16 +73,14 @@ object UserStorage extends LoggingCompanion[UserStorage] {
       lsql"""SELECT id, username, u_role
              |FROM users
              | WHERE id = $id
-            """
-        .stripMargin
+            """.stripMargin
         .query[User]
         .option
 
     def findAll: ConnectionIO[List[User]] =
       lsql"""SELECT id, username, u_role
              |FROM users
-            """
-        .stripMargin
+            """.stripMargin
         .query[User]
         .to[List]
 
@@ -86,11 +88,7 @@ object UserStorage extends LoggingCompanion[UserStorage] {
       lsql"""UPDATE users
              | SET u_role = 'admin'
              | WHERE id = $id
-            """
-        .stripMargin
-        .update
-        .run
-        .void
+            """.stripMargin.update.run.void
   }
 
 }

@@ -6,4 +6,4 @@ import derevo.derive
 import sttp.tapir.derevo.schema
 
 @derive(encoder, decoder, schema)
-case class PhotoWithMeta (id: Int, userSubmissions: List[UserSubmission])
+case class PhotoWithMeta(id: Int, userSubmissions: List[UserSubmission])
