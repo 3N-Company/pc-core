@@ -96,15 +96,16 @@ final class PhotoEndpoints[F[
       }
 
   val setMetadata =
-      baseEndpoints.adminEndpoint
-          .post
-          .in("photo")
-          .in(path[Int])
-          .in("metadata")
-          .in(jsonBody[Submission])
-          .serverLogic{ case (uuid, (photoId, metadata)) =>
-            MetadataStorage[F].upsert(photoId, metadata).map(_.asRight[Unit])
-          }
+    baseEndpoints
+      .adminEndpoint
+      .post
+      .in("photo")
+      .in(path[Int])
+      .in("metadata")
+      .in(jsonBody[Submission])
+      .serverLogic { case (uuid, (photoId, metadata)) =>
+        MetadataStorage[F].upsert(photoId, metadata).map(_.asRight[StatusCode])
+      }
 
   val photosPagedWithMeta =
     endpoint.get

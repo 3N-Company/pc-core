@@ -15,6 +15,7 @@ import tofu.higherKind.derived.representableK
 import tofu.logging.derivation.loggingMidTry
 import tofu.logging.{Logging, LoggingCompanion}
 import tofu.syntax.doobie.log.string._
+import cats.tagless.syntax.functorK._
 
 @derive(representableK, loggingMidTry)
 trait PhotoStorage[F[_]] {
@@ -85,7 +86,7 @@ object PhotoStorage extends LoggingCompanion[PhotoStorage] {
     def getAll: ConnectionIO[List[Int]] =
       lsql"""SELECT id FROM photo""".query[Int].to[List]
 
-    def getAllWithMeta(page: Int, size: Int): ConnectionIO[List[PhotoMetadata]] =
+    def getAllWithMeta: ConnectionIO[List[PhotoMetadata]] =
       lsql"""SELECT id, name
                 | FROM photo
                 | LEFT JOIN metadata 
