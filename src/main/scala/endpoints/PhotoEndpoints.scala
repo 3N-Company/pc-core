@@ -3,7 +3,7 @@ package endpoints
 import cats.Monad
 import cats.effect.{Blocker, ContextShift, Sync}
 import cats.syntax.either._
-import db.models.UserSubmission
+import db.models.{Submission, UserSubmission}
 import db.{PhotoStorage, SubmissionStorage}
 import sttp.capabilities
 import sttp.capabilities.fs2.Fs2Streams
@@ -16,6 +16,7 @@ import tofu.syntax.feither._
 import tofu.syntax.monadic._
 
 import java.nio.file.{Path, Paths, StandardOpenOption}
+import java.util.UUID
 
 
 final class PhotoEndpoints[F[_]: Monad: PhotoStorage: SubmissionStorage: Sync: ContextShift: GenUUID]
@@ -33,6 +34,19 @@ final class PhotoEndpoints[F[_]: Monad: PhotoStorage: SubmissionStorage: Sync: C
         .out(jsonBody[List[UserSubmission]])
         .serverLogic{
           case (_, photoId) => SubmissionStorage[F].findAllForPhoto(photoId).map(_.asRight[StatusCode])
+        }
+
+    def submitMetadata =
+      baseEndpoints
+        .secureEndpoint
+        .post
+        .in("photo")
+        .in(path[Int])
+        .in("submit")
+        .in(jsonBody[Submission])
+        .serverLogic{
+          case (user, (id, submission)) =>
+            SubmissionStorage[F].create(id, user, submission).map(_.asRight[StatusCode])
         }
 
     def getPhoto =
@@ -74,6 +88,6 @@ final class PhotoEndpoints[F[_]: Monad: PhotoStorage: SubmissionStorage: Sync: C
         }
 
     def all: List[ServerEndpoint[_, _, _, Fs2Streams[F] with capabilities.WebSockets, F]] =
-      List(allSumbissions, getPhoto, uploadPhoto)
+      List(allSumbissions, submitMetadata, getPhoto, uploadPhoto)
 }
 

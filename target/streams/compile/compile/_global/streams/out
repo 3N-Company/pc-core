@@ -1,78 +1,9 @@
 [0m[[0m[0mdebug[0m] [0m[0mAcquiring lock on file /home/nikolaiser/Documents/pet/geophoto_backend/project/target/.sbt-compilation-infos/geophoto_backend-compile/.sbt-idea-lock ...[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/db/models/User.scala:4:22: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport doobie.{Meta, Read}[0m
-[0m[[0m[33mwarn[0m] [0m[0m                     ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/endpoints/BaseEndpoints.scala:12:16: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport distage._[0m
-[0m[[0m[33mwarn[0m] [0m[0m               ^[0m
-[0m[[0m[33mwarn[0m] [0m[0mtwo warnings found[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/Main.scala:54:39: Auto-application to `()` is deprecated. Supply the empty argument list `()` explicitly to invoke method apply,[0m
-[0m[[0m[33mwarn[0m] [0m[0mor remove the empty argument list from its definition (Java-defined methods are exempt).[0m
-[0m[[0m[33mwarn[0m] [0m[0mIn Scala 3, an unapplied method like this will be eta-expanded into a function.[0m
-[0m[[0m[33mwarn[0m] [0m[0m      routes = Http4sServerInterpreter[IO].toRoutes(serverEndpoints)[0m
-[0m[[0m[33mwarn[0m] [0m[0m                                      ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/Main.scala:2:62: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport cats.effect.{Blocker, ConcurrentEffect, ContextShift, Effect, ExitCode, IO, IOApp, Sync}[0m
-[0m[[0m[33mwarn[0m] [0m[0m                                                             ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/Main.scala:10:19: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport sttp.tapir._[0m
-[0m[[0m[33mwarn[0m] [0m[0m                  ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/Main.scala:19:29: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport cats.syntax.traverse._[0m
-[0m[[0m[33mwarn[0m] [0m[0m                            ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/Main.scala:20:18: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport db.models.Credentials[0m
-[0m[[0m[33mwarn[0m] [0m[0m                 ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/db/SessionSql.scala:11:24: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport doobie.postgres._[0m
-[0m[[0m[33mwarn[0m] [0m[0m                       ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/db/SessionStorage.scala:8:34: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport doobie.postgres.implicits._[0m
-[0m[[0m[33mwarn[0m] [0m[0m                                 ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/db/SubmissionStorage.scala:17:24: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport doobie.postgres._[0m
-[0m[[0m[33mwarn[0m] [0m[0m                       ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/db/UserStorage.scala:4:32: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport db.models.{Credentials, User}[0m
-[0m[[0m[33mwarn[0m] [0m[0m                               ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/db/models/Submission.scala:8:18: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport java.util.UUID[0m
-[0m[[0m[33mwarn[0m] [0m[0m                 ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/endpoints/BaseEndpoints.scala:12:16: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport distage._[0m
-[0m[[0m[33mwarn[0m] [0m[0m               ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m11 warnings found[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/Main.scala:54:39: Auto-application to `()` is deprecated. Supply the empty argument list `()` explicitly to invoke method apply,[0m
-[0m[[0m[33mwarn[0m] [0m[0mor remove the empty argument list from its definition (Java-defined methods are exempt).[0m
-[0m[[0m[33mwarn[0m] [0m[0mIn Scala 3, an unapplied method like this will be eta-expanded into a function.[0m
-[0m[[0m[33mwarn[0m] [0m[0m      routes = Http4sServerInterpreter[IO].toRoutes(serverEndpoints)[0m
-[0m[[0m[33mwarn[0m] [0m[0m                                      ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/Main.scala:2:62: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport cats.effect.{Blocker, ConcurrentEffect, ContextShift, Effect, ExitCode, IO, IOApp, Sync}[0m
-[0m[[0m[33mwarn[0m] [0m[0m                                                             ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/Main.scala:10:19: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport sttp.tapir._[0m
-[0m[[0m[33mwarn[0m] [0m[0m                  ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/Main.scala:19:29: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport cats.syntax.traverse._[0m
-[0m[[0m[33mwarn[0m] [0m[0m                            ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/Main.scala:20:18: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport db.models.Credentials[0m
-[0m[[0m[33mwarn[0m] [0m[0m                 ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/db/SessionSql.scala:11:24: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport doobie.postgres._[0m
-[0m[[0m[33mwarn[0m] [0m[0m                       ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/db/SessionStorage.scala:8:34: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport doobie.postgres.implicits._[0m
-[0m[[0m[33mwarn[0m] [0m[0m                                 ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/db/SubmissionStorage.scala:17:24: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport doobie.postgres._[0m
-[0m[[0m[33mwarn[0m] [0m[0m                       ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/db/UserStorage.scala:4:32: Unused import[0m
-[0m[[0m[33mwarn[0m] [0m[0mimport db.models.{Credentials, User}[0m
-[0m[[0m[33mwarn[0m] [0m[0m                               ^[0m
 [0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/endpoints/PhotoEndpoints.scala:18:29: Unused import[0m
 [0m[[0m[33mwarn[0m] [0m[0mimport java.nio.file.{Path, Paths, StandardOpenOption}[0m
 [0m[[0m[33mwarn[0m] [0m[0m                            ^[0m
-[0m[[0m[33mwarn[0m] [0m[0m10 warnings found[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/nikolaiser/Documents/pet/geophoto_backend/src/main/scala/endpoints/PhotoEndpoints.scala:19:18: Unused import[0m
+[0m[[0m[33mwarn[0m] [0m[0mimport java.util.UUID[0m
+[0m[[0m[33mwarn[0m] [0m[0m                 ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mtwo warnings found[0m
 [0m[[0m[0mdebug[0m] [0m[0mReleasing lock on file /home/nikolaiser/Documents/pet/geophoto_backend/project/target/.sbt-compilation-infos/geophoto_backend-compile/.sbt-idea-lock.[0m
