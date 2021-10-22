@@ -25,25 +25,31 @@ object SessionStorage extends LoggingCompanion[SessionStorage] {
 
   def apply[F[_]: SessionStorage]: SessionStorage[F] = implicitly
 
-  def make[F[_]: Apply, DB[_]: Monad](sessionSql: SessionSql[DB], txr: Txr[F, DB]): SessionStorage[F] = {
+  def make[F[_]: Apply, DB[_]: Monad](
+      sessionSql: SessionSql[DB],
+      txr: Txr[F, DB]
+  ): SessionStorage[F] = {
     val impl = new Impl[DB](sessionSql): SessionStorage[DB]
     val tx = txr.trans
     impl.mapK(tx)
   }
 
-
-  final class Impl[DB[_]: Monad](sessionSql: SessionSql[DB]) extends SessionStorage[DB] {
+  final class Impl[DB[_]: Monad](sessionSql: SessionSql[DB])
+      extends SessionStorage[DB] {
 
     def createSessionCookie(userId: UUID): DB[Option[String]] =
       sessionSql.createSession(userId) >>= sessionSql.createCookie
 
-    def getUserId(cookie: String): DB[Option[UUID]] = sessionSql.getUserId(cookie)
+    def getUserId(cookie: String): DB[Option[UUID]] =
+      sessionSql.getUserId(cookie)
 
     def getUser(cookie: String): DB[Option[User]] = sessionSql.getUser(cookie)
 
-    def deleteSession(cookie: String): DB[Unit] = sessionSql.deleteSession(cookie)
+    def deleteSession(cookie: String): DB[Unit] =
+      sessionSql.deleteSession(cookie)
 
-    override def deleteAllSessions(user: UUID): DB[Unit] = sessionSql.deleteAllSessions(user)
+    override def deleteAllSessions(user: UUID): DB[Unit] =
+      sessionSql.deleteAllSessions(user)
   }
 
 }

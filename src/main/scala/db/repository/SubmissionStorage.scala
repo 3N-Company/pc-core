@@ -33,37 +33,44 @@ object SubmissionStorage extends LoggingCompanion[SubmissionStorage] {
 
   def apply[F[_]: SubmissionStorage]: SubmissionStorage[F] = implicitly
 
+  final class Make[F[_]: Apply, DB[
+      _
+  ]: Monad: LiftConnectionIO: EmbeddableLogHandler: Logging.Make: Tries](
+      txr: Txr[F, DB]
+  ) extends Lifecycle.Of[Identity[*], SubmissionStorage[F]](
+        Lifecycle.pure(make[F, DB](txr))
+      )
 
-
-  final class Make[F[_]: Apply, DB[_]: Monad: LiftConnectionIO: EmbeddableLogHandler: Logging.Make: Tries](txr: Txr[F, DB]) extends Lifecycle.Of[Identity[*], SubmissionStorage[F]](
-    Lifecycle.pure(make[F, DB](txr))
-  )
-
-  def make[F[_]: Apply, DB[_]: Monad: LiftConnectionIO: EmbeddableLogHandler: Logging.Make: Tries](txr: Txr[F, DB]): SubmissionStorage[F] = {
-    val sql = EmbeddableLogHandler[DB].embedLift(implicit lh => new Impl).attachErrLogs
+  def make[F[_]: Apply, DB[
+      _
+  ]: Monad: LiftConnectionIO: EmbeddableLogHandler: Logging.Make: Tries](
+      txr: Txr[F, DB]
+  ): SubmissionStorage[F] = {
+    val sql =
+      EmbeddableLogHandler[DB].embedLift(implicit lh => new Impl).attachErrLogs
     val tx = txr.trans
     sql.mapK(tx)
   }
 
-  final class Impl(implicit lh: LogHandler) extends SubmissionStorage[ConnectionIO] {
+  final class Impl(implicit lh: LogHandler)
+      extends SubmissionStorage[ConnectionIO] {
 
-    def create(photoId: Int, userId: UUID, metadata: Submission): ConnectionIO[Unit] =
+    def create(
+        photoId: Int,
+        userId: UUID,
+        metadata: Submission
+    ): ConnectionIO[Unit] =
       lsql"""INSERT INTO submission(photo_id, user_id, name) VALUES(
             |$photoId,
             |$userId,
             |${metadata.name}
-            |) ON CONFLICT (photo_id, user_id) DO UPDATE SET name = ${metadata.name}"""
-        .stripMargin
-        .update
-        .run
-        .void
+            |) ON CONFLICT (photo_id, user_id) DO UPDATE SET name = ${metadata.name}""".stripMargin.update.run.void
 
     def find(photoId: Int, userId: UUID): ConnectionIO[Option[Submission]] =
       lsql"""SELECT name
             |FROM submission
             |WHERE photo_id = $photoId AND user_id = $userId
-            |"""
-        .stripMargin
+            |""".stripMargin
         .query[Submission]
         .option
 
@@ -73,8 +80,7 @@ object SubmissionStorage extends LoggingCompanion[SubmissionStorage] {
             |JOIN users
             |ON user_id = users.id
             |WHERE photo_id = $photoId
-            |"""
-        .stripMargin
+            |""".stripMargin
         .query[UserSubmission]
         .to[List]
 
@@ -84,11 +90,9 @@ object SubmissionStorage extends LoggingCompanion[SubmissionStorage] {
             |JOIN photo
             |ON photo_id = photo.id
             |WHERE user_id = $userId
-            |"""
-        .stripMargin
+            |""".stripMargin
         .query[PhotoSubmission]
         .to[List]
-
 
   }
 }

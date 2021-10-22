@@ -1,5 +1,14 @@
 import cats.Monad
-import cats.effect.{Blocker, ConcurrentEffect, ContextShift, Effect, ExitCode, IO, IOApp, Sync}
+import cats.effect.{
+  Blocker,
+  ConcurrentEffect,
+  ContextShift,
+  Effect,
+  ExitCode,
+  IO,
+  IOApp,
+  Sync
+}
 import common.Config
 import db.{DB, Migrator}
 import distage._
@@ -22,12 +31,11 @@ import tofu.syntax.monadic._
 
 import scala.concurrent.ExecutionContext
 
+object Main extends IOApp {
 
-object Main extends IOApp{
-
-  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+  implicit val ec: ExecutionContext =
+    scala.concurrent.ExecutionContext.Implicits.global
   //dirty
-
 
   def app(locator: Locator): IO[Unit] =
     for {
@@ -42,14 +50,18 @@ object Main extends IOApp{
       routes = Http4sServerInterpreter[IO].toRoutes(serverEndpoints)
       _ <- BlazeServerBuilder[IO](ec)
         .enableHttp2(true)
-        .withHttpApp(Router("/" -> routes, "/api" -> swagger.routes[IO]).orNotFound)
+        .withHttpApp(
+          Router("/" -> routes, "/api" -> swagger.routes[IO]).orNotFound
+        )
         .bindHttp(config.serverPort, "0.0.0.0")
         .serve
         .compile
         .drain
     } yield ()
 
-  def Program[F[_]: TagK: ConcurrentEffect: ContextShift, DB[_]: TagK: Delay: Monad: ContextShift: UnliftIO: Tries: LiftConnectionIO] = {
+  def Program[F[_]: TagK: ConcurrentEffect: ContextShift, DB[
+      _
+  ]: TagK: Delay: Monad: ContextShift: UnliftIO: Tries: LiftConnectionIO] = {
     CommonModule[F] ++
       Config.Module[F] ++
       DB.Module[F, DB] ++
@@ -61,11 +73,9 @@ object Main extends IOApp{
     make[Blocker].fromResource(Blocker[F])
   }
 
-
-
   override def run(args: List[String]): IO[ExitCode] =
     Injector[IO]()
       .produce(Program[IO, ConnectionCIO[IO, *]], Roots.Everything)
-      .use {app}
+      .use { app }
       .as(ExitCode.Success)
 }

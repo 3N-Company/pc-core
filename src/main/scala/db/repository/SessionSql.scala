@@ -33,39 +33,39 @@ object SessionSql extends LoggingCompanion[SessionSql] {
 
   def apply[F[_]: SessionSql]: SessionSql[F] = implicitly
 
-  final class Make[DB[_]: Monad: LiftConnectionIO: EmbeddableLogHandler: Logging.Make: Tries]  extends Lifecycle.Of[Identity[*], SessionSql[DB]] (
-    Lifecycle.pure(make[DB])
-  )
+  final class Make[DB[
+      _
+  ]: Monad: LiftConnectionIO: EmbeddableLogHandler: Logging.Make: Tries]
+      extends Lifecycle.Of[Identity[*], SessionSql[DB]](
+        Lifecycle.pure(make[DB])
+      )
 
-  def make[DB[_]: Monad: LiftConnectionIO: EmbeddableLogHandler: Logging.Make: Tries]: SessionSql[DB] = {
+  def make[DB[
+      _
+  ]: Monad: LiftConnectionIO: EmbeddableLogHandler: Logging.Make: Tries]
+      : SessionSql[DB] = {
     EmbeddableLogHandler[DB].embedLift(implicit lh => new Impl).attachErrLogs
   }
 
-
   final class Impl(implicit lh: LogHandler) extends SessionSql[ConnectionIO] {
 
-
     def createSession(userId: UUID): ConnectionIO[UUID] =
-      lsql"""INSERT INTO sessions (user_id) VALUES ($userId)"""
-        .update
+      lsql"""INSERT INTO sessions (user_id) VALUES ($userId)""".update
         .withUniqueGeneratedKeys[UUID]("id")
 
     def createCookie(sessionId: UUID): ConnectionIO[Option[String]] =
       lsql"""SELECT (
              | id || '-' || encode(hmac(id::text, key, 'sha256'), 'hex')
              |) FROM sessions WHERE id = $sessionId
-            """
-        .stripMargin
+            """.stripMargin
         .query[String]
         .option
-
 
     def getUserId(cookie: String): ConnectionIO[Option[UUID]] =
       lsql"""SELECT user_id FROM sessions WHERE (
             | id || '-' || encode(hmac(id::text, key, 'sha256'), 'hex')
             |) = $cookie
-            |"""
-        .stripMargin
+            |""".stripMargin
         .query[UUID]
         .option
 
@@ -77,8 +77,7 @@ object SessionSql extends LoggingCompanion[SessionSql] {
             |WHERE (
             | sessions.id || '-' || encode(hmac(sessions.id::text, sessions.key, 'sha256'), 'hex')
             |) = $cookie
-            |"""
-        .stripMargin
+            |""".stripMargin
         .query[User]
         .option
 
@@ -86,20 +85,12 @@ object SessionSql extends LoggingCompanion[SessionSql] {
       lsql"""DELETE FROM sessions WHERE(
            | id || '-' || encode(hmac(id::text, key, 'sha256'), 'hex')
            |) = ${cookie}
-           |"""
-        .stripMargin
-        .update
-        .run
-        .void
+           |""".stripMargin.update.run.void
 
     def deleteAllSessions(userId: UUID): ConnectionIO[Unit] =
       lsql"""DELETE FROM sessions
              |WHERE user_id = $userId
-            """
-        .stripMargin
-        .update
-        .run
-        .void
+            """.stripMargin.update.run.void
 
   }
 }

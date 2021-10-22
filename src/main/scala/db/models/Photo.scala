@@ -4,4 +4,4 @@ import derevo.derive
 import tofu.logging.derivation.loggable
 
 @derive(loggable)
-case class Photo (path: String)
+case class Photo(path: String)
