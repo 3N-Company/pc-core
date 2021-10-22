@@ -69,7 +69,6 @@ object PhotoStorage extends LoggingCompanion[PhotoStorage] {
         .query[String]
         .option
 
-    def getAllPagedSorted(offset: Int, limit: Int)
   }
 
 }

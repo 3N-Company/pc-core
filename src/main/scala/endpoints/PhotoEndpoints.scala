@@ -59,7 +59,7 @@ final class PhotoEndpoints[F[_]: Monad: PhotoStorage: SubmissionStorage: Sync: C
       baseEndpoints
         .adminEndpoint
         .post
-        .in("photo" / "upload")
+        .in("photo")
         .in(streamBinaryBody(Fs2Streams[F]))
         .out(plainBody[Int])
         .serverLogic{
