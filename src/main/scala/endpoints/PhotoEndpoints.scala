@@ -13,10 +13,13 @@ import sttp.tapir.json.circe._
 import sttp.tapir.server.ServerEndpoint
 import tofu.generate.GenUUID
 import tofu.syntax.feither._
+import tofu.syntax.foption._
 import tofu.syntax.monadic._
 import cats.syntax.traverse._
 import common.Config
+import endpoints.models.PhotoWithMeta
 import sttp.tapir.codec.newtype.codecForNewType
+
 
 import java.nio.file.{Path, Paths, StandardOpenOption}
 import java.util.UUID
@@ -61,8 +64,22 @@ final class PhotoEndpoints[F[_]: Monad: PhotoStorage: SubmissionStorage: UserPho
         .serverLogic{
           case ((user, _), _) =>
             UserPhotoStorage[F].getNextPhoto(user).flatMap { nextPhoto =>
-              nextPhoto.traverse(UserPhotoStorage[F].upsert(user, _)) >> nextPhoto.asRight[StatusCode].pure
-            }
+              nextPhoto.traverse(UserPhotoStorage[F].upsert(user, _)) >> nextPhoto.pure
+            }.rightIn[StatusCode]
+        }
+
+    val nextPhotoWithMeta =
+      baseEndpoints
+        .secureEndpoint
+        .get
+        .in("photo"/ "next-with-meta")
+        .out(jsonBody[Option[PhotoWithMeta]])
+        .serverLogic{
+          case ((user, _), _) =>
+            UserPhotoStorage[F].getNextPhoto(user).semiflatMap{ photoId =>
+              UserPhotoStorage[F].upsert(user, photoId) >>
+                  SubmissionStorage[F].findAllForPhoto(photoId).map(PhotoWithMeta(photoId, _))
+            }.rightIn[StatusCode]
         }
 
     val photosPaged =
@@ -116,6 +133,6 @@ final class PhotoEndpoints[F[_]: Monad: PhotoStorage: SubmissionStorage: UserPho
         }
 
     def all: List[ServerEndpoint[_, _, _, Fs2Streams[F] with capabilities.WebSockets, F]] =
-      List(allSumbissions, submitMetadata, nextPhoto, photosPaged, getPhoto, uploadPhoto)
+      List(allSumbissions, submitMetadata, nextPhoto, nextPhotoWithMeta, photosPaged, getPhoto, uploadPhoto)
 }
 
