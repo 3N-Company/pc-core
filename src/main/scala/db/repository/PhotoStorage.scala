@@ -5,8 +5,8 @@ import cats.{Apply, Monad}
 import db.models.PhotoMetadata
 import derevo.derive
 import distage._
-import doobie.{ConnectionIO, Update}
 import doobie.util.log.LogHandler
+import doobie.{ConnectionIO, Update}
 import izumi.fundamentals.platform.functional.Identity
 import tofu.Tries
 import tofu.doobie.LiftConnectionIO

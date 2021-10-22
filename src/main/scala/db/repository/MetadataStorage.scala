@@ -18,7 +18,6 @@ import tofu.logging.{Logging, LoggingCompanion}
 import tofu.syntax.doobie.log.string._
 import tofu.syntax.monadic._
 
-
 @derive(representableK, loggingMidTry)
 trait MetadataStorage[F[_]] {
   def upsert(photoId: Int, metadata: Submission): F[Unit]
