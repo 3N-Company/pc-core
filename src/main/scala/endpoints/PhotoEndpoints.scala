@@ -7,7 +7,7 @@ import db.models.{Submission, UserSubmission}
 import db.repository.{PhotoStorage, SubmissionStorage, UserPhotoStorage}
 import sttp.capabilities
 import sttp.capabilities.fs2.Fs2Streams
-import sttp.model.{HeaderNames, StatusCode}
+import sttp.model.{ContentTypeRange, HeaderNames, MediaType, StatusCode}
 import sttp.tapir._
 import sttp.tapir.json.circe._
 import sttp.tapir.server.ServerEndpoint
@@ -111,6 +111,7 @@ final class PhotoEndpoints[F[
       .in("photo")
       .in(path[Int])
       .out(header[Long](HeaderNames.ContentLength))
+      .out(header(HeaderNames.ContentType, MediaType.ImageJpeg.toString))
       .out(streamBinaryBody(Fs2Streams[F]))
       .errorOut(statusCode)
       .serverLogic { photoId =>
