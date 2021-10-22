@@ -1,0 +1,4 @@
+package endpoints
+
+object UserEndpoints {
+}
