@@ -3,7 +3,7 @@ package endpoints
 import cats.Monad
 import cats.syntax.traverse._
 import db.SessionStorage
-import db.models.User
+import db.models.{Role, User}
 import sttp.model.StatusCode
 import sttp.tapir._
 import sttp.tapir.server.PartialServerEndpoint
@@ -48,7 +48,7 @@ object BaseEndpoints {
             .map(SessionStorage[F].getUser)
             .flatTraverse(_.map(_.toRight(StatusCode.NotFound)))
             .flatMapIn{
-              case User(id, _, "admin") => Right(id)
+              case User(id, _, Role.Admin) => Right(id)
               case _ => Left(StatusCode.Forbidden)
             }
         )

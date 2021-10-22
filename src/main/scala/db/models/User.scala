@@ -7,7 +7,7 @@ import sttp.tapir.derevo.schema
 import tofu.logging.derivation.{MaskMode, loggable, masked}
 
 import java.util.UUID
-/*
+
 @derive(encoder, decoder, loggable, schema)
 sealed trait Role
 
@@ -36,14 +36,13 @@ object Role {
 
 }
 
-*/
 
 @derive(loggable, encoder, decoder, schema)
 case class Credentials(username: String, @masked(MaskMode.Erase) password: String)
 
 
 @derive(loggable, encoder, decoder, schema)
-case class User (id: UUID, username: String,  role: String)
+case class User (id: UUID, username: String,  role: Role)
 
 
 
