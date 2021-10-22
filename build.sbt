@@ -9,4 +9,16 @@ addCompilerPlugin("org.typelevel" %% "kind-projector"     % "0.13.2" cross Cross
 
 libraryDependencies ++= Dependencies.all
 
+enablePlugins(JavaAppPackaging, DockerPlugin)
+
 scalacOptions ++= ScalaOpts.all
+
+dockerRepository := Some("""ghcr.io""")
+
+packageName := "3n-company/geophoto_backend"
+
+dockerBaseImage := "adoptopenjdk:11-jre-hotspot"
+
+dockerExposedPorts := Seq(8080)
+
+dockerUpdateLatest := true
