@@ -1,6 +1,5 @@
 package db.repository
 
-
 import cats.{Apply, Monad}
 import db.models.{PhotoSubmission, Submission, UserSubmission}
 import derevo.derive
@@ -24,52 +23,51 @@ import java.util.UUID
 
 @derive(representableK, loggingMidTry)
 trait MetadataStorage[F[_]] {
-    def upsert(photoId: Int, metadata: Submission): F[Unit]
-    def find(photoId: Int): F[Option[Submission]]
+  def upsert(photoId: Int, metadata: Submission): F[Unit]
+  def find(photoId: Int): F[Option[Submission]]
 }
 
 object MetadataStorage extends LoggingCompanion[MetadataStorage] {
 
-    def apply[F[_]: MetadataStorage]: MetadataStorage[F] = implicitly
+  def apply[F[_]: MetadataStorage]: MetadataStorage[F] = implicitly
 
-    final class Make[F[_]: Apply, DB[
-        _
-    ]: Monad: LiftConnectionIO: EmbeddableLogHandler: Logging.Make: Tries](
-                                                                              txr: Txr[F, DB]
-                                                                          ) extends Lifecycle.Of[Identity[*], MetadataStorage[F]](
+  final class Make[F[_]: Apply, DB[
+      _
+  ]: Monad: LiftConnectionIO: EmbeddableLogHandler: Logging.Make: Tries](
+      txr: Txr[F, DB]
+  ) extends Lifecycle.Of[Identity[*], MetadataStorage[F]](
         Lifecycle.pure(make[F, DB](txr))
-    )
+      )
 
-    def make[F[_]: Apply, DB[
-        _
-    ]: Monad: LiftConnectionIO: EmbeddableLogHandler: Logging.Make: Tries](
-                                                                              txr: Txr[F, DB]
-                                                                          ): MetadataStorage[F] = {
-        val sql =
-            EmbeddableLogHandler[DB].embedLift(implicit lh => new Impl).attachErrLogs
-        val tx = txr.trans
-        sql.mapK(tx)
-    }
+  def make[F[_]: Apply, DB[
+      _
+  ]: Monad: LiftConnectionIO: EmbeddableLogHandler: Logging.Make: Tries](
+      txr: Txr[F, DB]
+  ): MetadataStorage[F] = {
+    val sql =
+      EmbeddableLogHandler[DB].embedLift(implicit lh => new Impl).attachErrLogs
+    val tx  = txr.trans
+    sql.mapK(tx)
+  }
 
-    final class Impl(implicit lh: LogHandler)
-        extends MetadataStorage[ConnectionIO] {
+  final class Impl(implicit lh: LogHandler) extends MetadataStorage[ConnectionIO] {
 
-        def upsert(
-                      photoId: Int,
-                      metadata: Submission
-                  ): ConnectionIO[Unit] =
-            lsql"""INSERT INTO metadata(photo_id, name) VALUES(
+    def upsert(
+        photoId: Int,
+        metadata: Submission
+    ): ConnectionIO[Unit] =
+      lsql"""INSERT INTO metadata(photo_id, name) VALUES(
                   |$photoId,
                   |${metadata.name}
                   |) ON CONFLICT (photo_id) DO UPDATE SET name = ${metadata.name}""".stripMargin.update.run.void
 
-        def find(photoId: Int): ConnectionIO[Option[Submission]] =
-            lsql"""SELECT name
+    def find(photoId: Int): ConnectionIO[Option[Submission]] =
+      lsql"""SELECT name
                   |FROM metadata
                   |WHERE photo_id = $photoId
                   |""".stripMargin
-                .query[Submission]
-                .option
+        .query[Submission]
+        .option
 
-    }
+  }
 }

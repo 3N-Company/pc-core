@@ -31,25 +31,25 @@ object Main extends IOApp {
 
   def app(locator: Locator): IO[Unit] =
     for {
-      endpoints <- IO.delay(locator.get[Set[EndpointsModule[IO]]])
-      _ <- locator.get[Migrator[IO]].migrate
-      config = locator.get[Config]
+      endpoints      <- IO.delay(locator.get[Set[EndpointsModule[IO]]])
+      _              <- locator.get[Migrator[IO]].migrate
+      config          = locator.get[Config]
       serverEndpoints = endpoints.toList.flatMap(_.all)
-      openapiYaml = OpenAPIDocsInterpreter()
-        .serverEndpointsToOpenAPI(serverEndpoints, "endpoints", "1")
-        .toYaml
-      swagger = new SwaggerHttp4s(openapiYaml)
-      routes = Http4sServerInterpreter[IO].toRoutes(serverEndpoints)
-      corsRoutes = CORS(routes)
-      _ <- BlazeServerBuilder[IO](ec)
-        .enableHttp2(true)
-        .withHttpApp(
-          Router("/" -> corsRoutes, "/api" -> swagger.routes[IO]).orNotFound
-        )
-        .bindHttp(config.serverPort, "0.0.0.0")
-        .serve
-        .compile
-        .drain
+      openapiYaml     = OpenAPIDocsInterpreter()
+                          .serverEndpointsToOpenAPI(serverEndpoints, "endpoints", "1")
+                          .toYaml
+      swagger         = new SwaggerHttp4s(openapiYaml)
+      routes          = Http4sServerInterpreter[IO].toRoutes(serverEndpoints)
+      corsRoutes      = CORS(routes)
+      _              <- BlazeServerBuilder[IO](ec)
+                          .enableHttp2(true)
+                          .withHttpApp(
+                            Router("/" -> corsRoutes, "/api" -> swagger.routes[IO]).orNotFound
+                          )
+                          .bindHttp(config.serverPort, "0.0.0.0")
+                          .serve
+                          .compile
+                          .drain
     } yield ()
 
   def Program[F[_]: TagK: ConcurrentEffect: ContextShift, DB[

@@ -96,9 +96,7 @@ final class PhotoEndpoints[F[
       }
 
   val setMetadata =
-    baseEndpoints
-      .adminEndpoint
-      .post
+    baseEndpoints.adminEndpoint.post
       .in("photo")
       .in(path[Int])
       .in("metadata")
