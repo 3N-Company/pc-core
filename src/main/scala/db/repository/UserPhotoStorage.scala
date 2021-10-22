@@ -55,11 +55,11 @@ object UserPhotoStorage extends LoggingCompanion[UserPhotoStorage] {
          | LIMIT 1),
          |  (
          |  SELECT MIN(id) FROM photo
-         |  ))
+         |  )) as next_photo
          | """
         .stripMargin
-        .query[Int]
-        .option
+        .query[Option[Int]]
+        .unique
 
     override def upsert(userId: UUID, photoId: Int): ConnectionIO[Unit] =
       lsql"""INSERT INTO user_photo (user_id, last_photo) VALUES(

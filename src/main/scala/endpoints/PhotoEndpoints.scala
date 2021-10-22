@@ -25,7 +25,7 @@ import java.util.UUID
 final class PhotoEndpoints[F[_]: Monad: PhotoStorage: SubmissionStorage: UserPhotoStorage: Sync: ContextShift: GenUUID]
     (baseEndpoints: BaseEndpoints[F], blocker: Blocker, config: Config) extends EndpointsModule[F] {
 
-    val pathPrefix = config.photoFolder
+    val pathPrefix = config.photoFolder + "/"
 
     val allSumbissions =
       baseEndpoints
