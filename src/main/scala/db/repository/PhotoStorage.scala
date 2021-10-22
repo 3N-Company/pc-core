@@ -1,5 +1,6 @@
 package db.repository
 
+import cats.tagless.syntax.functorK._
 import cats.{Apply, Monad}
 import db.models.PhotoMetadata
 import derevo.derive
@@ -15,7 +16,6 @@ import tofu.higherKind.derived.representableK
 import tofu.logging.derivation.loggingMidTry
 import tofu.logging.{Logging, LoggingCompanion}
 import tofu.syntax.doobie.log.string._
-import cats.tagless.syntax.functorK._
 
 @derive(representableK, loggingMidTry)
 trait PhotoStorage[F[_]] {

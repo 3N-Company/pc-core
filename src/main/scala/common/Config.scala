@@ -1,10 +1,10 @@
 package common
 
 import cats.effect.{Blocker, ContextShift, Sync}
-import pureconfig._
-import pureconfig.module.catseffect.syntax._
-import pureconfig.generic.auto._
 import distage._
+import pureconfig._
+import pureconfig.generic.auto._
+import pureconfig.module.catseffect.syntax._
 
 case class Config(
     dbConnectionString: String,

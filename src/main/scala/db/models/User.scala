@@ -1,13 +1,12 @@
 package db.models
 import derevo.circe.{decoder, encoder}
 import derevo.derive
-import doobie.{Meta, Read}
+import doobie.Meta
 import doobie.postgres.implicits._
 import io.circe.{Decoder, Encoder}
 import sttp.tapir.derevo.schema
-import tofu.logging.derivation.{MaskMode, loggable, masked}
-import cats.syntax.either._
 import sttp.tapir.{Schema, Validator}
+import tofu.logging.derivation.{MaskMode, loggable, masked}
 
 import java.util.UUID
 

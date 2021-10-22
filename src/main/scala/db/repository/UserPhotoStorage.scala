@@ -1,12 +1,11 @@
 package db.repository
 
-import cats.{Apply, Monad}
-import doobie.ConnectionIO
-import doobie.util.log.LogHandler
-import tofu.logging.{Logging, LoggingCompanion}
-import tofu.syntax.doobie.log.string._
 import cats.tagless.syntax.functorK._
+import cats.{Apply, Monad}
 import derevo.derive
+import doobie.ConnectionIO
+import doobie.postgres.implicits._
+import doobie.util.log.LogHandler
 import izumi.distage.model.definition.Lifecycle
 import izumi.fundamentals.platform.functional.Identity
 import tofu.Tries
@@ -15,8 +14,9 @@ import tofu.doobie.log.EmbeddableLogHandler
 import tofu.doobie.transactor.Txr
 import tofu.higherKind.derived.representableK
 import tofu.logging.derivation.loggingMidTry
+import tofu.logging.{Logging, LoggingCompanion}
+import tofu.syntax.doobie.log.string._
 import tofu.syntax.monadic._
-import doobie.postgres.implicits._
 
 import java.util.UUID
 

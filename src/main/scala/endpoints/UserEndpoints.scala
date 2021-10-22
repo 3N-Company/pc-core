@@ -1,18 +1,18 @@
 package endpoints
 
 import cats.Monad
+import cats.syntax.either._
 import db.models.{PhotoSubmission, User}
 import db.repository.{SubmissionStorage, UserStorage}
-import sttp.tapir._
-import sttp.tapir.json.circe._
-import cats.syntax.either._
 import sttp.capabilities
 import sttp.capabilities.fs2.Fs2Streams
 import sttp.model.StatusCode
+import sttp.tapir._
+import sttp.tapir.json.circe._
 import sttp.tapir.server.ServerEndpoint
-import tofu.syntax.monadic._
 import tofu.syntax.feither._
 import tofu.syntax.foption._
+import tofu.syntax.monadic._
 
 import java.util.UUID
 

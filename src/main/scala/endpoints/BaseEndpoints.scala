@@ -8,9 +8,8 @@ import sttp.model.StatusCode
 import sttp.tapir._
 import sttp.tapir.server.PartialServerEndpoint
 import tofu.syntax.feither._
-import tofu.syntax.monadic._
 import tofu.syntax.foption._
-import tofu.syntax.feither
+import tofu.syntax.monadic._
 
 import java.util.UUID
 

@@ -1,8 +1,9 @@
 package db.repository
 
 
+import cats.tagless.syntax.functorK._
 import cats.{Apply, Monad}
-import db.models.{PhotoSubmission, Submission, UserSubmission}
+import db.models.Submission
 import derevo.derive
 import doobie.ConnectionIO
 import doobie.util.log.LogHandler
@@ -17,10 +18,7 @@ import tofu.logging.derivation.loggingMidTry
 import tofu.logging.{Logging, LoggingCompanion}
 import tofu.syntax.doobie.log.string._
 import tofu.syntax.monadic._
-import doobie.postgres.implicits._
-import cats.tagless.syntax.functorK._
 
-import java.util.UUID
 
 @derive(representableK, loggingMidTry)
 trait MetadataStorage[F[_]] {

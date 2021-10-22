@@ -1,9 +1,11 @@
 package db.repository
 
+import cats.tagless.syntax.functorK._
 import cats.{Apply, Monad}
 import db.models.{PhotoSubmission, Submission, UserSubmission}
 import derevo.derive
 import doobie.ConnectionIO
+import doobie.postgres.implicits._
 import doobie.util.log.LogHandler
 import izumi.distage.model.definition.Lifecycle
 import izumi.fundamentals.platform.functional.Identity
@@ -16,8 +18,6 @@ import tofu.logging.derivation.loggingMidTry
 import tofu.logging.{Logging, LoggingCompanion}
 import tofu.syntax.doobie.log.string._
 import tofu.syntax.monadic._
-import doobie.postgres.implicits._
-import cats.tagless.syntax.functorK._
 
 import java.util.UUID
 

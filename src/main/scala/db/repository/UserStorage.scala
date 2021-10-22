@@ -1,5 +1,6 @@
 package db.repository
 
+import cats.tagless.syntax.functorK._
 import cats.{Apply, Monad}
 import db.models.{Credentials, User}
 import derevo.derive
@@ -16,7 +17,6 @@ import tofu.logging.derivation.loggingMidTry
 import tofu.logging.{Logging, LoggingCompanion}
 import tofu.syntax.doobie.log.string._
 import tofu.syntax.monadic._
-import cats.tagless.syntax.functorK._
 
 import java.util.UUID
 

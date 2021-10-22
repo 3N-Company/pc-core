@@ -31,10 +31,13 @@
         <parameter value="-Xlint:stars-align" />
         <parameter value="-Xlint:type-parameter-shadow" />
         <parameter value="-Xlint:constant" />
+        <parameter value="-Yrangepos" />
+        <parameter value="-P:semanticdb:targetroot:/home/nikolaiser/Documents/pet/geophoto_backend/target/scala-2.13/meta" />
       </parameters>
       <plugins>
         <plugin path="$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/olegpy/better-monadic-for_2.13/0.3.1/better-monadic-for_2.13-0.3.1.jar" />
         <plugin path="$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/typelevel/kind-projector_2.13.6/0.13.2/kind-projector_2.13.6-0.13.2.jar" />
+        <plugin path="$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/semanticdb-scalac_2.13.6/4.4.28/semanticdb-scalac_2.13.6-4.4.28.jar" />
       </plugins>
     </profile>
   </component>

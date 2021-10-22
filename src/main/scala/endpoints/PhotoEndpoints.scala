@@ -103,7 +103,7 @@ final class PhotoEndpoints[F[
       .in(path[Int])
       .in("metadata")
       .in(jsonBody[Submission])
-      .serverLogic { case (uuid, (photoId, metadata)) =>
+      .serverLogic { case (_, (photoId, metadata)) =>
         MetadataStorage[F].upsert(photoId, metadata).map(_.asRight[StatusCode])
       }
 

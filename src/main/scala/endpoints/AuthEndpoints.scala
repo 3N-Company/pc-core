@@ -1,23 +1,21 @@
 package endpoints
 
 import cats.Monad
+import cats.syntax.traverse._
 import db.models.Credentials
 import db.repository.{SessionStorage, UserStorage}
 import sttp.capabilities
 import sttp.capabilities.fs2.Fs2Streams
 import sttp.model.StatusCode
 import sttp.model.headers.CookieValueWithMeta
-import sttp.tapir.EndpointIO.Header
 import sttp.tapir.EndpointInput.WWWAuthenticate
 import sttp.tapir._
 import sttp.tapir.json.circe._
 import sttp.tapir.model.UsernamePassword
 import sttp.tapir.server.ServerEndpoint
-import tofu.syntax.monadic._
-import tofu.syntax.foption._
 import tofu.syntax.feither._
-import cats.syntax.traverse._
-import cats.syntax.either._
+import tofu.syntax.foption._
+import tofu.syntax.monadic._
 
 final class AuthEndpoints[F[_]: Monad: UserStorage: SessionStorage](
     baseEndpoints: BaseEndpoints[F]

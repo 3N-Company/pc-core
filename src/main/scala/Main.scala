@@ -1,25 +1,21 @@
 import cats.Monad
-import cats.effect.{Blocker, ConcurrentEffect, ContextShift, Effect, ExitCode, IO, IOApp, Sync}
+import cats.effect.{Blocker, ConcurrentEffect, ContextShift, ExitCode, IO, IOApp, Sync}
 import common.Config
 import db.{DB, Migrator}
 import distage._
 import endpoints.{Endpoints, EndpointsModule}
 import org.http4s.blaze.server.BlazeServerBuilder
-import org.http4s.server.Router
 import org.http4s.implicits._
-import sttp.tapir._
+import org.http4s.server.Router
+import org.http4s.server.middleware.CORS
 import sttp.tapir.docs.openapi.OpenAPIDocsInterpreter
+import sttp.tapir.openapi.circe.yaml._
 import sttp.tapir.server.http4s._
-import tofu.{Delay, Tries}
+import sttp.tapir.swagger.http4s.SwaggerHttp4s
 import tofu.doobie.{ConnectionCIO, LiftConnectionIO}
 import tofu.generate.GenUUID
 import tofu.lift.UnliftIO
-import sttp.tapir.openapi.circe.yaml._
-import sttp.tapir.swagger.http4s.SwaggerHttp4s
-import cats.syntax.traverse._
-import db.models.Credentials
-import org.http4s.server.middleware.CORS
-import tofu.syntax.monadic._
+import tofu.{Delay, Tries}
 
 import scala.concurrent.ExecutionContext
 
