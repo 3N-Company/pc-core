@@ -97,6 +97,15 @@ final class PhotoEndpoints[F[
           .map(_.asRight[Unit])
       }
 
+  val allPhotos =
+    endpoint.get
+      .in("photo" / "all")
+      .out(jsonBody[List[Int]])
+      .serverLogic{ _ =>
+        PhotoStorage[F].getAll.map(_.asRight[Unit])
+      }
+
+
   val getPhoto =
     endpoint.get
       .in("photo")
@@ -150,6 +159,7 @@ final class PhotoEndpoints[F[
       submitMetadata,
       nextPhoto,
       nextPhotoWithMeta,
+      allPhotos,
       photosPaged,
       getPhoto,
       uploadPhoto

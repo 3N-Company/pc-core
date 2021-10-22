@@ -2,29 +2,21 @@ package db
 import cats.Monad
 import cats.effect.{ContextShift, Effect}
 import common.Config
-import db.repository.{
-  PhotoStorage,
-  SessionSql,
-  SessionStorage,
-  SubmissionStorage,
-  UserPhotoStorage,
-  UserStorage
-}
+import db.repository._
 import distage._
 import doobie.util.transactor.Transactor
-import tofu.{Delay, Errors, Tries}
 import tofu.doobie.LiftConnectionIO
 import tofu.doobie.log.{EmbeddableLogHandler, LogHandlerF}
 import tofu.doobie.transactor.Txr
 import tofu.lift.UnliftIO
 import tofu.logging.Logging
 import tofu.syntax.doobie.log.handler._
+import tofu.{Delay, Errors, Tries}
 
 object DB {
   def Module[F[_]: TagK: Effect: ContextShift, DB[
       _
-  ]: TagK: Delay: Monad: ContextShift: UnliftIO: Tries: LiftConnectionIO]
-      : ModuleDef = new ModuleDef {
+  ]: TagK: Delay: Monad: ContextShift: UnliftIO: Tries: LiftConnectionIO]: ModuleDef = new ModuleDef {
     make[Transactor[F]].from { config: Config =>
       Transactor.fromDriverManager[F](
         driver = "org.postgresql.Driver",

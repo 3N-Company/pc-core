@@ -21,6 +21,7 @@ trait PhotoStorage[F[_]] {
   def insert(path: String): F[Int]
   def find(id: Int): F[Option[String]]
   def getPaged(page: Int, size: Int): F[List[Int]]
+  def getAll: F[List[Int]]
 }
 
 object PhotoStorage extends LoggingCompanion[PhotoStorage] {
@@ -67,6 +68,9 @@ object PhotoStorage extends LoggingCompanion[PhotoStorage] {
             |""".stripMargin
         .query[Int]
         .to[List]
+
+    def getAll: ConnectionIO[List[Int]] =
+      lsql"""SELECT id FROM photo""".query[Int].to[List]
   }
 
 }
