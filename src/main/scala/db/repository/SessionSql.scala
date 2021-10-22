@@ -1,33 +1,32 @@
-package db
+package db.repository
 
 import cats.Monad
 import db.models.User
 import derevo.derive
+import distage._
 import doobie.ConnectionIO
-import doobie.util.log.LogHandler
-import tofu.logging.{Logging, LoggingCompanion}
-import tofu.syntax.monadic._
-import tofu.syntax.doobie.log.string._
-import doobie.postgres._
 import doobie.postgres.implicits._
+import doobie.util.log.LogHandler
+import izumi.fundamentals.platform.functional.Identity
+import tofu.Tries
 import tofu.doobie.LiftConnectionIO
 import tofu.doobie.log.EmbeddableLogHandler
 import tofu.higherKind.derived.representableK
 import tofu.logging.derivation.loggingMidTry
-import distage._
-import izumi.fundamentals.platform.functional.Identity
-import tofu.Tries
+import tofu.logging.{Logging, LoggingCompanion}
+import tofu.syntax.doobie.log.string._
+import tofu.syntax.monadic._
 
 import java.util.UUID
 
 @derive(representableK, loggingMidTry)
 trait SessionSql[F[_]] {
-  def init: F[Unit]
   def createSession(userId: UUID): F[UUID]
   def createCookie(sessionID: UUID): F[Option[String]]
   def getUserId(cookie: String): F[Option[UUID]]
   def getUser(cookie: String): F[Option[User]]
   def deleteSession(cookie: String): F[Unit]
+  def deleteAllSessions(userID: UUID): F[Unit]
 }
 
 object SessionSql extends LoggingCompanion[SessionSql] {
@@ -44,23 +43,7 @@ object SessionSql extends LoggingCompanion[SessionSql] {
 
 
   final class Impl(implicit lh: LogHandler) extends SessionSql[ConnectionIO] {
-    def init: ConnectionIO[Unit] =
-      lsql"""CREATE TABLE IF NOT EXISTS sessions (
-            |  id uuid NOT NULL DEFAULT gen_random_uuid(),
-            |  user_id uuid NOT NULL,
-            |  key text NOT NULL DEFAULT gen_salt('md5'),
-            |  CONSTRAINT PK_15 PRIMARY KEY ("id"),
-            |  CONSTRAINT FK_40 FOREIGN KEY ( user_id ) REFERENCES users ("id")
-            |);
-            |
-            |CREATE INDEX IF NOT EXISTS sessions_cookie_idx ON sessions(
-            | (id || '-' || encode(hmac(id::text, "key", 'sha256'), 'hex'))
-            |);
-            |"""
-        .stripMargin
-        .update
-        .run
-        .void
+
 
     def createSession(userId: UUID): ConnectionIO[UUID] =
       lsql"""INSERT INTO sessions (user_id) VALUES ($userId)"""
@@ -104,6 +87,15 @@ object SessionSql extends LoggingCompanion[SessionSql] {
            | id || '-' || encode(hmac(id::text, key, 'sha256'), 'hex')
            |) = ${cookie}
            |"""
+        .stripMargin
+        .update
+        .run
+        .void
+
+    def deleteAllSessions(userId: UUID): ConnectionIO[Unit] =
+      lsql"""DELETE FROM sessions
+             |WHERE user_id = $userId
+            """
         .stripMargin
         .update
         .run

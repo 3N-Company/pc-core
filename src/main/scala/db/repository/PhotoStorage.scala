@@ -1,27 +1,26 @@
-package db
+package db.repository
 
 import cats.{Apply, Monad}
 import derevo.derive
+import distage._
 import doobie.ConnectionIO
 import doobie.util.log.LogHandler
-import tofu.doobie.LiftConnectionIO
-import tofu.doobie.log.EmbeddableLogHandler
-import tofu.higherKind.derived.representableK
-import tofu.logging.{Logging, LoggingCompanion}
-import tofu.logging.derivation.{loggingMid, loggingMidTry}
-import tofu.syntax.doobie.log.string._
-import tofu.syntax.monadic._
-import distage._
 import izumi.fundamentals.platform.functional.Identity
 import tofu.Tries
+import tofu.doobie.LiftConnectionIO
+import tofu.doobie.log.EmbeddableLogHandler
 import tofu.doobie.transactor.Txr
+import tofu.higherKind.derived.representableK
+import tofu.logging.derivation.loggingMidTry
+import tofu.logging.{Logging, LoggingCompanion}
+import tofu.syntax.doobie.log.string._
 import cats.tagless.syntax.functorK._
 
 @derive(representableK, loggingMidTry)
 trait PhotoStorage[F[_]] {
-  def init: F[Unit]
   def insert(path: String): F[Int]
   def find(id: Int): F[Option[String]]
+  def getPaged(page: Int, size: Int): F[List[Int]]
 }
 
 object PhotoStorage extends LoggingCompanion[PhotoStorage] {
@@ -44,17 +43,6 @@ object PhotoStorage extends LoggingCompanion[PhotoStorage] {
 
 
   final class Impl(implicit lh: LogHandler) extends PhotoStorage[ConnectionIO] {
-    def init: ConnectionIO[Unit] =
-      lsql"""CREATE TABLE IF NOT EXISTS photo
-            |(
-            | id   serial NOT NULL,
-            | file_path varchar(50) NOT NULL,
-            | CONSTRAINT PK_5 PRIMARY KEY ( "id" )
-            |)"""
-        .stripMargin
-        .update
-        .run
-        .void
 
     def insert(path: String): ConnectionIO[Int] =
       lsql"""INSERT INTO photo (file_path) VALUES($path)"""
@@ -69,6 +57,15 @@ object PhotoStorage extends LoggingCompanion[PhotoStorage] {
         .query[String]
         .option
 
+    def getPaged(page: Int, size: Int): ConnectionIO[List[Int]] =
+      lsql"""SELECT id
+            | FROM photo
+            | WHERE id > ${page * size}
+            | LIMIT $size
+            |"""
+        .stripMargin
+        .query[Int]
+        .to[List]
   }
 
 }

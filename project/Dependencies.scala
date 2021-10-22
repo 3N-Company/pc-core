@@ -82,5 +82,12 @@ object Dependencies {
     val all = Seq(dsl)
   }
 
-  val all: Seq[ModuleID] = Doobie.all ++ Postgres.all ++ Tofu.all ++ Tapir.all ++ Derevo.all ++ Izumi.all ++ Pureconfig.all ++ Http4s.all
+  object Flyway {
+    val version = "7.14.1"
+    val flywayCore = "org.flywaydb" % "flyway-core" % version
+    val all = Seq(flywayCore)
+  }
+
+  val all: Seq[ModuleID] = Doobie.all ++ Postgres.all ++ Tofu.all ++ Tapir.all ++ Derevo.all ++
+    Izumi.all ++ Pureconfig.all ++ Http4s.all ++ Flyway.all
 }

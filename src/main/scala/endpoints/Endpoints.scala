@@ -7,9 +7,11 @@ object Endpoints {
 
     make[PhotoEndpoints[F]].from[PhotoEndpoints[F]]
     make[AuthEndpoints[F]].from[AuthEndpoints[F]]
+    make[UserEndpoints[F]].from[UserEndpoints[F]]
 
 
     many[EndpointsModule[F]].ref[PhotoEndpoints[F]]
     many[EndpointsModule[F]].ref[AuthEndpoints[F]]
+    many[EndpointsModule[F]].ref[UserEndpoints[F]]
   }
 }

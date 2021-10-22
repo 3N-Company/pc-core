@@ -1,7 +1,7 @@
 import cats.Monad
 import cats.effect.{Blocker, ConcurrentEffect, ContextShift, Effect, ExitCode, IO, IOApp, Sync}
 import common.Config
-import db.{DB, PhotoStorage, SessionStorage, SubmissionStorage, UserStorage}
+import db.{DB, Migrator}
 import distage._
 import endpoints.{Endpoints, EndpointsModule}
 import org.http4s.blaze.server.BlazeServerBuilder
@@ -27,25 +27,13 @@ object Main extends IOApp{
 
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   //dirty
-  def prepareDB(locator: Locator): IO[Unit] =
-    for{
-      users <- locator.get[UserStorage[IO]].pure[IO]
-      photos = locator.get[PhotoStorage[IO]]
-      sessions = locator.get[SessionStorage[IO]]
-      submissions = locator.get[SubmissionStorage[IO]]
-      _ <- users.init
-      _ <- photos.init
-      _ <- sessions.init
-      _ <- submissions.init
-      //_ <- users.create(Credentials("admin", "admin"))
-    } yield ()
 
 
   def app(locator: Locator): IO[Unit] =
     for {
       endpoints <- IO.delay(locator.get[Set[EndpointsModule[IO]]])
+      _ <- locator.get[Migrator[IO]].migrate
       config = locator.get[Config]
-      _ <- prepareDB(locator)
       serverEndpoints = endpoints.toList.flatMap(_.all)
       openapiYaml = OpenAPIDocsInterpreter()
         .serverEndpointsToOpenAPI(serverEndpoints, "endpoints", "1")

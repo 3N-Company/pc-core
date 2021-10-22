@@ -1,30 +1,32 @@
-package db
+package db.repository
 
 import cats.{Apply, Monad}
 import db.models.{Credentials, User}
 import derevo.derive
-import doobie.{ConnectionIO, LogHandler}
-import tofu.doobie.LiftConnectionIO
-import tofu.doobie.log.EmbeddableLogHandler
-import tofu.higherKind.derived.representableK
-import tofu.logging.{Logging, LoggingCompanion}
-import tofu.logging.derivation.loggingMidTry
-import tofu.syntax.doobie.log.string._
-import tofu.syntax.monadic._
 import doobie.postgres.implicits._
+import doobie.{ConnectionIO, LogHandler}
 import izumi.distage.model.definition.Lifecycle
 import izumi.fundamentals.platform.functional.Identity
 import tofu.Tries
+import tofu.doobie.LiftConnectionIO
+import tofu.doobie.log.EmbeddableLogHandler
 import tofu.doobie.transactor.Txr
+import tofu.higherKind.derived.representableK
+import tofu.logging.derivation.loggingMidTry
+import tofu.logging.{Logging, LoggingCompanion}
+import tofu.syntax.doobie.log.string._
+import tofu.syntax.monadic._
 import cats.tagless.syntax.functorK._
 
 import java.util.UUID
 
 @derive(representableK, loggingMidTry)
 trait UserStorage[F[_]] {
-  def init: F[Unit]
   def create(credentials: Credentials): F[UUID]
-  def find(credentials: Credentials): F[Option[UUID]]
+  def findId(credentials: Credentials): F[Option[UUID]]
+  def find(id: UUID): F[Option[User]]
+  def findAll: F[List[User]]
+  def promote(id: UUID): F[Unit]
 }
 
 object UserStorage extends LoggingCompanion[UserStorage] {
@@ -43,25 +45,7 @@ object UserStorage extends LoggingCompanion[UserStorage] {
     sql.mapK(tx)
   }
 
-  //CREATE EXTENSION pgcrypto;
-  //CREATE TYPE role AS ENUM ('plain', 'admin');
   final class Impl(implicit lh: LogHandler) extends UserStorage[ConnectionIO] {
-    def init: ConnectionIO[Unit] =
-      lsql"""
-            |
-            |CREATE TABLE IF NOT EXISTS users
-            |(
-            | id       uuid NOT NULL DEFAULT gen_random_uuid(),
-            | username text NOT NULL,
-            | password text NOT NULL,
-            | u_role role NOT NULL DEFAULT 'plain',
-            | CONSTRAINT PK_9 PRIMARY KEY ( "id" ),
-            | CONSTRAINT ind_51 UNIQUE ( username )
-            |)"""
-        .stripMargin
-        .update
-        .run
-        .void
 
     def create(credentials: Credentials): ConnectionIO[UUID] =
       lsql"""INSERT INTO users (username, password) VALUES (
@@ -72,7 +56,7 @@ object UserStorage extends LoggingCompanion[UserStorage] {
         .update
         .withUniqueGeneratedKeys[UUID]("id")
 
-    def find(credentials: Credentials): ConnectionIO[Option[UUID]] =
+    def findId(credentials: Credentials): ConnectionIO[Option[UUID]] =
       lsql"""SELECT id
             |  FROM users
             | WHERE username = ${credentials.username}
@@ -81,6 +65,32 @@ object UserStorage extends LoggingCompanion[UserStorage] {
         .query[UUID]
         .option
 
+    def find(id: UUID): ConnectionIO[Option[User]] =
+      lsql"""SELECT id, username, u_role
+             |FROM users
+             | WHERE id = $id
+            """
+        .stripMargin
+        .query[User]
+        .option
+
+    def findAll: ConnectionIO[List[User]] =
+      lsql"""SELECT id, username, u_role
+             |FROM users
+            """
+        .stripMargin
+        .query[User]
+        .to[List]
+
+    def promote(id: UUID): ConnectionIO[Unit] =
+      lsql"""UPDATE users
+             | SET u_role = 'admin'
+             | WHERE id = $id
+            """
+        .stripMargin
+        .update
+        .run
+        .void
   }
 
 }

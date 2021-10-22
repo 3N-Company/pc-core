@@ -4,7 +4,7 @@ import cats.Monad
 import cats.effect.{Blocker, ContextShift, Sync}
 import cats.syntax.either._
 import db.models.{Submission, UserSubmission}
-import db.{PhotoStorage, SubmissionStorage}
+import db.repository.{PhotoStorage, SubmissionStorage, UserPhotoStorage}
 import sttp.capabilities
 import sttp.capabilities.fs2.Fs2Streams
 import sttp.model.{HeaderNames, StatusCode}
@@ -14,19 +14,21 @@ import sttp.tapir.server.ServerEndpoint
 import tofu.generate.GenUUID
 import tofu.syntax.feither._
 import tofu.syntax.monadic._
+import cats.syntax.traverse._
+import sttp.tapir.codec.newtype.codecForNewType
 
 import java.nio.file.{Path, Paths, StandardOpenOption}
 import java.util.UUID
 
 
-final class PhotoEndpoints[F[_]: Monad: PhotoStorage: SubmissionStorage: Sync: ContextShift: GenUUID]
+final class PhotoEndpoints[F[_]: Monad: PhotoStorage: SubmissionStorage: UserPhotoStorage: Sync: ContextShift: GenUUID]
     (baseEndpoints: BaseEndpoints[F], blocker: Blocker) extends EndpointsModule[F] {
 
     val pathPrefix = "./photo/"
 
-    def allSumbissions =
+    val allSumbissions =
       baseEndpoints
-        .adminEndpoint
+        .secureEndpoint
         .get
         .in("photo")
         .in(path[Int])
@@ -36,7 +38,7 @@ final class PhotoEndpoints[F[_]: Monad: PhotoStorage: SubmissionStorage: Sync: C
           case (_, photoId) => SubmissionStorage[F].findAllForPhoto(photoId).map(_.asRight[StatusCode])
         }
 
-    def submitMetadata =
+    val submitMetadata =
       baseEndpoints
         .secureEndpoint
         .post
@@ -45,11 +47,36 @@ final class PhotoEndpoints[F[_]: Monad: PhotoStorage: SubmissionStorage: Sync: C
         .in("submit")
         .in(jsonBody[Submission])
         .serverLogic{
-          case (user, (id, submission)) =>
+          case ((user, _), (id, submission)) =>
             SubmissionStorage[F].create(id, user, submission).map(_.asRight[StatusCode])
         }
 
-    def getPhoto =
+    val nextPhoto =
+      baseEndpoints
+        .secureEndpoint
+        .get
+        .in("photo" / "next")
+        .out(jsonBody[Option[Int]])
+        .serverLogic{
+          case ((user, _), _) =>
+            UserPhotoStorage[F].getNextPhoto(user).flatMap { nextPhoto =>
+              nextPhoto.traverse(UserPhotoStorage[F].upsert(user, _)) >> nextPhoto.asRight[StatusCode].pure
+            }
+        }
+
+    val photosPaged =
+      endpoint
+        .get
+        .in("photo")
+        .in(query[Int]("page").and(query[Int]("size")))
+        .out(jsonBody[List[Int]])
+        .serverLogic{
+          case (page, size) =>
+            PhotoStorage[F].getPaged(page, size)
+            .map(_.asRight[Unit])
+        }
+
+    val getPhoto =
       endpoint
         .get
         .in("photo")
@@ -69,7 +96,7 @@ final class PhotoEndpoints[F[_]: Monad: PhotoStorage: SubmissionStorage: Sync: C
               }
         }
 
-    def uploadPhoto: ServerEndpoint[(Option[String], fs2.Stream[F, Byte]), StatusCode, Int, Any with Fs2Streams[F], F] =
+    val uploadPhoto: ServerEndpoint[(Option[String], fs2.Stream[F, Byte]), StatusCode, Int, Any with Fs2Streams[F], F] =
       baseEndpoints
         .adminEndpoint
         .post
@@ -88,6 +115,6 @@ final class PhotoEndpoints[F[_]: Monad: PhotoStorage: SubmissionStorage: Sync: C
         }
 
     def all: List[ServerEndpoint[_, _, _, Fs2Streams[F] with capabilities.WebSockets, F]] =
-      List(allSumbissions, submitMetadata, getPhoto, uploadPhoto)
+      List(allSumbissions, submitMetadata, nextPhoto, photosPaged, getPhoto, uploadPhoto)
 }
 

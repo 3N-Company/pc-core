@@ -2,6 +2,7 @@ package db
 import cats.Monad
 import cats.effect.{ContextShift, Effect}
 import common.Config
+import db.repository.{PhotoStorage, SessionSql, SessionStorage, SubmissionStorage, UserPhotoStorage, UserStorage}
 import distage._
 import doobie.util.transactor.Transactor
 import tofu.{Delay, Errors, Tries}
@@ -41,7 +42,9 @@ object DB {
     make[PhotoStorage[F]].fromResource[PhotoStorage.Make[F, DB]]
     make[UserStorage[F]].fromResource[UserStorage.Make[F, DB]]
     make[SubmissionStorage[F]].fromResource[SubmissionStorage.Make[F, DB]]
+    make[UserPhotoStorage[F]].fromResource[UserPhotoStorage.Make[F, DB]]
 
+    make[Migrator[F]].from[Migrator[F]]
 
   }
 

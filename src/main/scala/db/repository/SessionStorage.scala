@@ -1,13 +1,12 @@
-package db
+package db.repository
 
 import cats.{Apply, Monad}
 import db.models.User
 import derevo.derive
-import tofu.higherKind.derived.representableK
-import tofu.logging.derivation.loggingMidTry
-import doobie.postgres.implicits._
 import tofu.doobie.transactor.Txr
+import tofu.higherKind.derived.representableK
 import tofu.logging.LoggingCompanion
+import tofu.logging.derivation.loggingMidTry
 import tofu.syntax.monadic._
 import cats.tagless.syntax.functorK._
 
@@ -15,11 +14,11 @@ import java.util.UUID
 
 @derive(representableK, loggingMidTry)
 trait SessionStorage[F[_]] {
-  def init: F[Unit]
   def createSessionCookie(userId: UUID): F[Option[String]]
   def getUserId(cookie: String): F[Option[UUID]]
   def getUser(cookie: String): F[Option[User]]
   def deleteSession(cookie: String): F[Unit]
+  def deleteAllSessions(user: UUID): F[Unit]
 }
 
 object SessionStorage extends LoggingCompanion[SessionStorage] {
@@ -34,7 +33,6 @@ object SessionStorage extends LoggingCompanion[SessionStorage] {
 
 
   final class Impl[DB[_]: Monad](sessionSql: SessionSql[DB]) extends SessionStorage[DB] {
-    def init: DB[Unit] = sessionSql.init
 
     def createSessionCookie(userId: UUID): DB[Option[String]] =
       sessionSql.createSession(userId) >>= sessionSql.createCookie
@@ -44,6 +42,8 @@ object SessionStorage extends LoggingCompanion[SessionStorage] {
     def getUser(cookie: String): DB[Option[User]] = sessionSql.getUser(cookie)
 
     def deleteSession(cookie: String): DB[Unit] = sessionSql.deleteSession(cookie)
+
+    override def deleteAllSessions(user: UUID): DB[Unit] = sessionSql.deleteAllSessions(user)
   }
 
 }

@@ -1,2 +1,6 @@
 [0m[[0m[0mdebug[0m] [0m[0mCopy resource mappings: [0m
 [0m[[0m[0mdebug[0m] [0m[0m	(/home/nikolaiser/Documents/pet/geophoto_backend/src/main/resources/application.conf,/home/nikolaiser/Documents/pet/geophoto_backend/target/scala-2.13/classes/application.conf)[0m
+[0m[[0m[0mdebug[0m] [0m[0m	(/home/nikolaiser/Documents/pet/geophoto_backend/src/main/resources/db/migration/V2__UserPhoto.sql,/home/nikolaiser/Documents/pet/geophoto_backend/target/scala-2.13/classes/db/migration/V2__UserPhoto.sql)[0m
+[0m[[0m[0mdebug[0m] [0m[0m	(/home/nikolaiser/Documents/pet/geophoto_backend/src/main/resources/db/migration/V1__Initial.sql,/home/nikolaiser/Documents/pet/geophoto_backend/target/scala-2.13/classes/db/migration/V1__Initial.sql)[0m
+[0m[[0m[0mdebug[0m] [0m[0m	(/home/nikolaiser/Documents/pet/geophoto_backend/src/main/resources/db/migration/V4__UserPhotoAlter.sql,/home/nikolaiser/Documents/pet/geophoto_backend/target/scala-2.13/classes/db/migration/V4__UserPhotoAlter.sql)[0m
+[0m[[0m[0mdebug[0m] [0m[0m	(/home/nikolaiser/Documents/pet/geophoto_backend/src/main/resources/db/migration/V3__SetAdminRole.sql,/home/nikolaiser/Documents/pet/geophoto_backend/target/scala-2.13/classes/db/migration/V3__SetAdminRole.sql)[0m

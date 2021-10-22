@@ -86,6 +86,7 @@
     <orderEntry type="library" name="sbt: io.monix:monix_2.13:3.4.0:jar" level="project" />
     <orderEntry type="library" name="sbt: net.java.dev.jna:jna:5.3.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.checkerframework:checker-qual:3.5.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.flywaydb:flyway-core:7.14.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.http4s:blaze-core_2.13:0.15.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.http4s:blaze-http_2.13:0.15.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.http4s:http4s-blaze-core_2.13:0.22.0:jar" level="project" />
