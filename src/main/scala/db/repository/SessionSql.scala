@@ -42,8 +42,7 @@ object SessionSql extends LoggingCompanion[SessionSql] {
 
   def make[DB[
       _
-  ]: Monad: LiftConnectionIO: EmbeddableLogHandler: Logging.Make: Tries]
-      : SessionSql[DB] = {
+  ]: Monad: LiftConnectionIO: EmbeddableLogHandler: Logging.Make: Tries]: SessionSql[DB] = {
     EmbeddableLogHandler[DB].embedLift(implicit lh => new Impl).attachErrLogs
   }
 

@@ -36,9 +36,7 @@ object BaseEndpoints {
         .errorOut(statusCode)
         .serverLogicForCurrent[(UUID, String), F](c =>
           c.toRight(StatusCode.Unauthorized)
-            .map(cookie =>
-              SessionStorage[F].getUserId(cookie).mapIn((_, cookie))
-            )
+            .map(cookie => SessionStorage[F].getUserId(cookie).mapIn((_, cookie)))
             .flatTraverse(_.map(_.toRight(StatusCode.Unauthorized)))
         )
 

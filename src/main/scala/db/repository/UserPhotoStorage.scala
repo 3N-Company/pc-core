@@ -45,12 +45,11 @@ object UserPhotoStorage extends LoggingCompanion[UserPhotoStorage] {
   ): UserPhotoStorage[F] = {
     val sql =
       EmbeddableLogHandler[DB].embedLift(implicit lh => new Impl).attachErrLogs
-    val tx = txr.trans
+    val tx  = txr.trans
     sql.mapK(tx)
   }
 
-  final class Impl(implicit lh: LogHandler)
-      extends UserPhotoStorage[ConnectionIO] {
+  final class Impl(implicit lh: LogHandler) extends UserPhotoStorage[ConnectionIO] {
     def getNextPhoto(userId: UUID): ConnectionIO[Option[Int]] =
       lsql"""SELECT COALESCE(
          |(SELECT photo.id

@@ -4,9 +4,9 @@ object Dependencies {
   object Doobie {
     private val version = "0.13.4"
 
-    val core = "org.tpolecat" %% "doobie-core" % version
+    val core           = "org.tpolecat" %% "doobie-core"     % version
     val doobiePostgres = "org.tpolecat" %% "doobie-postgres" % version
-    val all = Seq(core, doobiePostgres)
+    val all            = Seq(core, doobiePostgres)
   }
 
   object Postgres {
@@ -19,9 +19,9 @@ object Dependencies {
 
   object Tofu {
     private val version = "0.10.6"
-    val tofu = "tf.tofu" %% "tofu" % version
-    val tofuLogging = "tf.tofu" %% "tofu-logging" % version
-    val tofuDoobie = "tf.tofu" %% "tofu-doobie-logging" % version
+    val tofu            = "tf.tofu" %% "tofu"                % version
+    val tofuLogging     = "tf.tofu" %% "tofu-logging"        % version
+    val tofuDoobie      = "tf.tofu" %% "tofu-doobie-logging" % version
 
     val all = Seq(tofu, tofuLogging, tofuDoobie)
   }
@@ -37,12 +37,12 @@ object Dependencies {
   object Tapir {
     private val version = "0.18.3"
 
-    val core = "com.softwaremill.sttp.tapir" %% "tapir-core" % version
+    val core      = "com.softwaremill.sttp.tapir" %% "tapir-core" % version
     val jsonCirce =
       "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % version
     val tapirHttp4s =
       "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % version
-    val derevo = "com.softwaremill.sttp.tapir" %% "tapir-derevo" % version
+    val derevo      = "com.softwaremill.sttp.tapir" %% "tapir-derevo" % version
     val openapiDocs =
       "com.softwaremill.sttp.tapir" %% "tapir-openapi-docs" % version
     val openapiCirceYaml =
@@ -65,7 +65,7 @@ object Dependencies {
     private val version = "2.5.9"
 
     val core = "co.fs2" %% "fs2-core" % version
-    val io = "co.fs2" %% "fs2-io" % version
+    val io   = "co.fs2" %% "fs2-io"   % version
 
     val all = Seq(core, io)
   }
@@ -81,7 +81,7 @@ object Dependencies {
   object Pureconfig {
     private val version = "0.13.0"
 
-    val pureconfig = "com.github.pureconfig" %% "pureconfig" % version
+    val pureconfig        = "com.github.pureconfig" %% "pureconfig" % version
     val catsEffectInterop =
       "com.github.pureconfig" %% "pureconfig-cats-effect" % version
 
@@ -97,9 +97,9 @@ object Dependencies {
   }
 
   object Flyway {
-    val version = "7.14.1"
+    val version    = "7.14.1"
     val flywayCore = "org.flywaydb" % "flyway-core" % version
-    val all = Seq(flywayCore)
+    val all        = Seq(flywayCore)
   }
 
   val all: Seq[ModuleID] =
