@@ -4,7 +4,6 @@ import cats.tagless.syntax.functorK._
 import cats.{Apply, Monad}
 import db.models.{Credentials, User}
 import derevo.derive
-import doobie.postgres.implicits._
 import doobie.{ConnectionIO, LogHandler}
 import izumi.distage.model.definition.Lifecycle
 import izumi.fundamentals.platform.functional.Identity
@@ -17,12 +16,16 @@ import tofu.logging.derivation.loggingMidTry
 import tofu.logging.{Logging, LoggingCompanion}
 import tofu.syntax.doobie.log.string._
 import tofu.syntax.monadic._
+import doobie._
+import doobie.implicits._
+import doobie.postgres._
+import doobie.postgres.implicits._
 
 import java.util.UUID
 
 @derive(representableK, loggingMidTry)
 trait UserStorage[F[_]] {
-  def create(credentials: Credentials): F[UUID]
+  def create(credentials: Credentials): F[Option[UUID]]
   def findId(credentials: Credentials): F[Option[UUID]]
   def find(id: UUID): F[Option[User]]
   def findAll: F[List[User]]
@@ -54,12 +57,17 @@ object UserStorage extends LoggingCompanion[UserStorage] {
 
   final class Impl(implicit lh: LogHandler) extends UserStorage[ConnectionIO] {
 
-    def create(credentials: Credentials): ConnectionIO[UUID] =
+    def create(credentials: Credentials): ConnectionIO[Option[UUID]] =
       lsql"""INSERT INTO users (username, password) VALUES (
             |  ${credentials.username},
             |  crypt(${credentials.password}, gen_salt('bf'))
-            |)""".stripMargin.update
+            |)""".stripMargin
+          .update
         .withUniqueGeneratedKeys[UUID]("id")
+          .attemptSomeSqlState {
+              case sqlstate.class23.UNIQUE_VIOLATION => ()
+          }.map(_.toOption)
+
 
     def findId(credentials: Credentials): ConnectionIO[Option[UUID]] =
       lsql"""SELECT id

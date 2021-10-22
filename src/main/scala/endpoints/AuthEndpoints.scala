@@ -4,6 +4,7 @@ import cats.Monad
 import cats.syntax.traverse._
 import db.models.Credentials
 import db.repository.{SessionStorage, UserStorage}
+import endpoints.models.SetCookie
 import sttp.capabilities
 import sttp.capabilities.fs2.Fs2Streams
 import sttp.model.StatusCode
@@ -24,7 +25,7 @@ final class AuthEndpoints[F[_]: Monad: UserStorage: SessionStorage](
   val login: ServerEndpoint[
     UsernamePassword,
     StatusCode,
-    CookieValueWithMeta,
+    SetCookie,
     Any,
     F
   ] =
@@ -35,7 +36,9 @@ final class AuthEndpoints[F[_]: Monad: UserStorage: SessionStorage](
           WWWAuthenticate.basic(WWWAuthenticate.DefaultRealm)
         )
       )
-      .out(setCookie(BaseEndpoints.authCookie))
+      //workaround - frontend bug
+        .out(jsonBody[SetCookie])
+      //.out(setCookie(BaseEndpoints.authCookie))
       .errorOut(statusCode)
       .serverLogic { credentials =>
         credentials.password
@@ -46,7 +49,8 @@ final class AuthEndpoints[F[_]: Monad: UserStorage: SessionStorage](
             SessionStorage[F]
               .createSessionCookie(uuid)
               .map(_.toRight(StatusCode.InternalServerError))
-              .mapIn(x => CookieValueWithMeta.unsafeApply(value = x))
+              //.mapIn(x => CookieValueWithMeta.unsafeApply(value = x))
+                .mapIn(SetCookie(BaseEndpoints.authCookie, _))
           }
       }
 
@@ -71,8 +75,12 @@ final class AuthEndpoints[F[_]: Monad: UserStorage: SessionStorage](
       .in("register")
       .in(jsonBody[Credentials])
       .out(emptyOutput)
+      .errorOut(statusCode)
       .serverLogic { credentials =>
-        UserStorage[F].create(credentials).void.rightIn[Unit]
+        UserStorage[F]
+          .create(credentials)
+          .toRightIn(StatusCode.Conflict)
+            .mapIn(_ => ())
       }
 
   override def all: List[
