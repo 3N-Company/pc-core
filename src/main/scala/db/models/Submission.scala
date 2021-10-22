@@ -15,3 +15,6 @@ case class UserSubmission(user: User, metadata: Submission)
 
 @derive(loggable, encoder, decoder, schema)
 case class PhotoSubmission(photoId: Int, metadata: Submission)
+
+@derive(loggable, encoder, decoder, schema)
+case class PhotoMetadata(photoId: Int, metadata: Option[Submission])

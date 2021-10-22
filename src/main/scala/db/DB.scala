@@ -45,6 +45,7 @@ object DB {
     make[UserStorage[F]].fromResource[UserStorage.Make[F, DB]]
     make[SubmissionStorage[F]].fromResource[SubmissionStorage.Make[F, DB]]
     make[UserPhotoStorage[F]].fromResource[UserPhotoStorage.Make[F, DB]]
+    make[MetadataStorage[F]].fromResource[MetadataStorage.Make[F, DB]]
 
     make[Migrator[F]].from[Migrator[F]]
 

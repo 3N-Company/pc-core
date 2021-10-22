@@ -1,6 +1,7 @@
 package db.repository
 
 import cats.{Apply, Monad}
+import db.models.PhotoMetadata
 import derevo.derive
 import distage._
 import doobie.ConnectionIO
@@ -14,14 +15,15 @@ import tofu.higherKind.derived.representableK
 import tofu.logging.derivation.loggingMidTry
 import tofu.logging.{Logging, LoggingCompanion}
 import tofu.syntax.doobie.log.string._
-import cats.tagless.syntax.functorK._
 
 @derive(representableK, loggingMidTry)
 trait PhotoStorage[F[_]] {
   def insert(path: String): F[Int]
   def find(id: Int): F[Option[String]]
   def getPaged(page: Int, size: Int): F[List[Int]]
+  def getPagedWithMeta(page: Int, size: Int): F[List[PhotoMetadata]]
   def getAll: F[List[Int]]
+  def getAllWithMeta: F[List[PhotoMetadata]]
 }
 
 object PhotoStorage extends LoggingCompanion[PhotoStorage] {
@@ -43,7 +45,7 @@ object PhotoStorage extends LoggingCompanion[PhotoStorage] {
   ): PhotoStorage[F] = {
     val sql =
       EmbeddableLogHandler[DB].embedLift(implicit lh => new Impl).attachErrLogs
-    val tx = txr.trans
+    val tx  = txr.trans
     sql.mapK(tx)
   }
 
@@ -69,8 +71,28 @@ object PhotoStorage extends LoggingCompanion[PhotoStorage] {
         .query[Int]
         .to[List]
 
+    def getPagedWithMeta(page: Int, size: Int): ConnectionIO[List[PhotoMetadata]] =
+      lsql"""SELECT id, name
+              | FROM photo
+              | LEFT JOIN metadata 
+              | ON photo.id = metadata.photo_id
+              | WHERE photo.id > ${page * size}
+              | LIMIT $size
+              """.stripMargin
+        .query[PhotoMetadata]
+        .to[List]
+
     def getAll: ConnectionIO[List[Int]] =
       lsql"""SELECT id FROM photo""".query[Int].to[List]
+
+    def getAllWithMeta(page: Int, size: Int): ConnectionIO[List[PhotoMetadata]] =
+      lsql"""SELECT id, name
+                | FROM photo
+                | LEFT JOIN metadata 
+                | ON photo.id = metadata.photo_id
+              """.stripMargin
+        .query[PhotoMetadata]
+        .to[List]
   }
 
 }

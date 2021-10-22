@@ -3,11 +3,14 @@ package endpoints
 import cats.Monad
 import cats.effect.{Blocker, ContextShift, Sync}
 import cats.syntax.either._
-import db.models.{Submission, UserSubmission}
-import db.repository.{PhotoStorage, SubmissionStorage, UserPhotoStorage}
+import cats.syntax.traverse._
+import common.Config
+import db.models.{PhotoMetadata, Submission, UserSubmission}
+import db.repository.{MetadataStorage, PhotoStorage, SubmissionStorage, UserPhotoStorage}
+import endpoints.models.PhotoWithSubmissions
 import sttp.capabilities
 import sttp.capabilities.fs2.Fs2Streams
-import sttp.model.{ContentTypeRange, HeaderNames, MediaType, StatusCode}
+import sttp.model.{HeaderNames, MediaType, StatusCode}
 import sttp.tapir._
 import sttp.tapir.json.circe._
 import sttp.tapir.server.ServerEndpoint
@@ -15,17 +18,12 @@ import tofu.generate.GenUUID
 import tofu.syntax.feither._
 import tofu.syntax.foption._
 import tofu.syntax.monadic._
-import cats.syntax.traverse._
-import common.Config
-import endpoints.models.PhotoWithMeta
-import sttp.tapir.codec.newtype.codecForNewType
 
-import java.nio.file.{Path, Paths, StandardOpenOption}
-import java.util.UUID
+import java.nio.file.{Path, StandardOpenOption}
 
 final class PhotoEndpoints[F[
     _
-]: Monad: PhotoStorage: SubmissionStorage: UserPhotoStorage: Sync: ContextShift: GenUUID](
+]: Monad: PhotoStorage: SubmissionStorage: UserPhotoStorage: MetadataStorage: Sync: ContextShift: GenUUID](
     baseEndpoints: BaseEndpoints[F],
     blocker: Blocker,
     config: Config
@@ -70,10 +68,10 @@ final class PhotoEndpoints[F[
           .rightIn[StatusCode]
       }
 
-  val nextPhotoWithMeta =
+  val nextPhotoWithSubmissions =
     baseEndpoints.secureEndpoint.get
-      .in("photo" / "next-with-meta")
-      .out(jsonBody[Option[PhotoWithMeta]])
+      .in("photo" / "next-with-submissions")
+      .out(jsonBody[Option[PhotoWithSubmissions]])
       .serverLogic { case ((user, _), _) =>
         UserPhotoStorage[F]
           .getNextPhoto(user)
@@ -81,7 +79,7 @@ final class PhotoEndpoints[F[
             UserPhotoStorage[F].upsert(user, photoId) >>
               SubmissionStorage[F]
                 .findAllForPhoto(photoId)
-                .map(PhotoWithMeta(photoId, _))
+                .map(PhotoWithSubmissions(photoId, _))
           }
           .rightIn[StatusCode]
       }
@@ -97,14 +95,43 @@ final class PhotoEndpoints[F[
           .map(_.asRight[Unit])
       }
 
+  val setMetadata =
+      baseEndpoints.adminEndpoint
+          .post
+          .in("photo")
+          .in(path[Int])
+          .in("metadata")
+          .in(jsonBody[Submission])
+          .serverLogic{ case (uuid, (photoId, metadata)) =>
+            MetadataStorage[F].upsert(photoId, metadata).map(_.asRight[Unit])
+          }
+
+  val photosPagedWithMeta =
+    endpoint.get
+      .in("photo" / "with-meta")
+      .in(query[Int]("page").and(query[Int]("size")))
+      .out(jsonBody[List[PhotoMetadata]])
+      .serverLogic { case (page, size) =>
+        PhotoStorage[F]
+          .getPagedWithMeta(page, size)
+          .map(_.asRight[Unit])
+      }
+
   val allPhotos =
     endpoint.get
       .in("photo" / "all")
       .out(jsonBody[List[Int]])
-      .serverLogic{ _ =>
+      .serverLogic { _ =>
         PhotoStorage[F].getAll.map(_.asRight[Unit])
       }
 
+  val allPhotosWithMeta =
+    endpoint.get
+      .in("photo" / "all-with-meta")
+      .out(jsonBody[List[PhotoMetadata]])
+      .serverLogic { _ =>
+        PhotoStorage[F].getAllWithMeta.map(_.asRight[Unit])
+      }
 
   val getPhoto =
     endpoint.get
@@ -140,14 +167,14 @@ final class PhotoEndpoints[F[
       .out(plainBody[Int])
       .serverLogic { case (_, stream) =>
         for {
-          name <- GenUUID[F].randomUUID
-          path = Path.of(pathPrefix ++ name.toString)
-          write = fs2.io.file.writeAll(
-            path,
-            blocker,
-            flags = Seq(StandardOpenOption.CREATE)
-          )
-          _ <- stream.through(write).compile.drain
+          name    <- GenUUID[F].randomUUID
+          path     = Path.of(pathPrefix ++ name.toString)
+          write    = fs2.io.file.writeAll(
+                       path,
+                       blocker,
+                       flags = Seq(StandardOpenOption.CREATE)
+                     )
+          _       <- stream.through(write).compile.drain
           photoId <- PhotoStorage[F].insert(path.toString)
         } yield photoId.asRight[StatusCode]
       }
@@ -159,9 +186,11 @@ final class PhotoEndpoints[F[
       allSumbissions,
       submitMetadata,
       nextPhoto,
-      nextPhotoWithMeta,
+      nextPhotoWithSubmissions,
       allPhotos,
+      allPhotosWithMeta,
       photosPaged,
+      photosPagedWithMeta,
       getPhoto,
       uploadPhoto
     )
