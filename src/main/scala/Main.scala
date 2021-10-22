@@ -1,7 +1,7 @@
 import cats.Monad
 import cats.effect.{Blocker, ConcurrentEffect, ContextShift, ExitCode, IO, IOApp, Sync}
 import common.Config
-import db.{DB, Migrator}
+import db.{DB, Migrator, PhotoInit}
 import distage._
 import endpoints.{Endpoints, EndpointsModule}
 import org.http4s.blaze.server.BlazeServerBuilder
@@ -29,6 +29,7 @@ object Main extends IOApp {
     for {
       endpoints      <- IO.delay(locator.get[Set[EndpointsModule[IO]]])
       _              <- locator.get[Migrator[IO]].migrate
+      _ <- locator.get[PhotoInit[IO]].init
       config          = locator.get[Config]
       serverEndpoints = endpoints.toList.flatMap(_.all)
       openapiYaml     = OpenAPIDocsInterpreter()

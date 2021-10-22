@@ -48,6 +48,7 @@ object DB {
     make[MetadataStorage[F]].fromResource[MetadataStorage.Make[F, DB]]
 
     make[Migrator[F]].from[Migrator[F]]
+    make[PhotoInit[F]].from[PhotoInit[F]]
 
   }
 

@@ -1,0 +1,1 @@
+ALTER TABLE photo ADD CONSTRAINT U_FilePath UNIQUE (file_path);

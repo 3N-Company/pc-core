@@ -5,7 +5,7 @@ import cats.{Apply, Monad}
 import db.models.PhotoMetadata
 import derevo.derive
 import distage._
-import doobie.ConnectionIO
+import doobie.{ConnectionIO, Update}
 import doobie.util.log.LogHandler
 import izumi.fundamentals.platform.functional.Identity
 import tofu.Tries
@@ -16,10 +16,12 @@ import tofu.higherKind.derived.representableK
 import tofu.logging.derivation.loggingMidTry
 import tofu.logging.{Logging, LoggingCompanion}
 import tofu.syntax.doobie.log.string._
+import tofu.syntax.monadic._
 
 @derive(representableK, loggingMidTry)
 trait PhotoStorage[F[_]] {
   def insert(path: String): F[Int]
+  def insertMany(paths: List[String]): F[Unit]
   def find(id: Int): F[Option[String]]
   def getPaged(page: Int, size: Int): F[List[Int]]
   def getPagedWithMeta(page: Int, size: Int): F[List[PhotoMetadata]]
@@ -55,6 +57,11 @@ object PhotoStorage extends LoggingCompanion[PhotoStorage] {
     def insert(path: String): ConnectionIO[Int] =
       lsql"""INSERT INTO photo (file_path) VALUES($path)""".update
         .withUniqueGeneratedKeys[Int]("id")
+
+    def insertMany(paths: List[String]): ConnectionIO[Unit] = {
+      val sql = """INSERT INTO photo (file_path) VALUES (?) ON CONFLICT DO NOTHING"""
+      Update[String](sql).updateMany(paths).void
+    }
 
     def find(id: Int): ConnectionIO[Option[String]] =
       lsql"""SELECT file_path
