@@ -48,7 +48,7 @@ object UserStorage extends LoggingCompanion[UserStorage] {
   ): UserStorage[F] = {
     val sql =
       EmbeddableLogHandler[DB].embedLift(implicit lh => new Impl).attachErrLogs
-    val tx = txr.trans
+    val tx  = txr.trans
     sql.mapK(tx)
   }
 

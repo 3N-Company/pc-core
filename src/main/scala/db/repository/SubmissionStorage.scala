@@ -48,12 +48,11 @@ object SubmissionStorage extends LoggingCompanion[SubmissionStorage] {
   ): SubmissionStorage[F] = {
     val sql =
       EmbeddableLogHandler[DB].embedLift(implicit lh => new Impl).attachErrLogs
-    val tx = txr.trans
+    val tx  = txr.trans
     sql.mapK(tx)
   }
 
-  final class Impl(implicit lh: LogHandler)
-      extends SubmissionStorage[ConnectionIO] {
+  final class Impl(implicit lh: LogHandler) extends SubmissionStorage[ConnectionIO] {
 
     def create(
         photoId: Int,

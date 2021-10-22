@@ -30,12 +30,11 @@ object SessionStorage extends LoggingCompanion[SessionStorage] {
       txr: Txr[F, DB]
   ): SessionStorage[F] = {
     val impl = new Impl[DB](sessionSql): SessionStorage[DB]
-    val tx = txr.trans
+    val tx   = txr.trans
     impl.mapK(tx)
   }
 
-  final class Impl[DB[_]: Monad](sessionSql: SessionSql[DB])
-      extends SessionStorage[DB] {
+  final class Impl[DB[_]: Monad](sessionSql: SessionSql[DB]) extends SessionStorage[DB] {
 
     def createSessionCookie(userId: UUID): DB[Option[String]] =
       sessionSql.createSession(userId) >>= sessionSql.createCookie
