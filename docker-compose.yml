@@ -15,11 +15,14 @@ services:
       DB-PASS: "secretpassword"
       SERVER-PORT: 8080
       PHOTO-FOLDER: "/data"
+      NORMALIZATION-HOST: "normalization"
     ports:
       - "8080:8080"
     volumes:
       - app-data:/data
     restart: always
+  normalization:
+      image: ghcr.io/3n-company/normalisation:main
 
 volumes:
     postgres-data:
