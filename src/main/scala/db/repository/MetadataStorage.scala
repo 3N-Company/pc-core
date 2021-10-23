@@ -55,8 +55,8 @@ object MetadataStorage extends LoggingCompanion[MetadataStorage] {
     ): ConnectionIO[Unit] =
       lsql"""INSERT INTO metadata(photo_id, latitude, longitude, name, photo_year) VALUES(
                   |$photoId,
-                  |${metadata.position.map(_.latitude)}
-                  |${metadata.position.map(_.longitude)}
+                  |${metadata.position.map(_.latitude)},
+                  |${metadata.position.map(_.longitude)},
                   |${metadata.name}
                   |) ON CONFLICT (photo_id) DO
                   | UPDATE SET
