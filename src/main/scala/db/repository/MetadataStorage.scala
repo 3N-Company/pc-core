@@ -58,6 +58,7 @@ object MetadataStorage extends LoggingCompanion[MetadataStorage] {
                   |${metadata.position.map(_.latitude)},
                   |${metadata.position.map(_.longitude)},
                   |${metadata.name}
+                  |${metadata.photoYear}
                   |) ON CONFLICT (photo_id) DO
                   | UPDATE SET
                   |  latitude = ${metadata.position.map(_.latitude)},
