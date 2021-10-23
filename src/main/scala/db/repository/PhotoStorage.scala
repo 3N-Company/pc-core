@@ -80,7 +80,7 @@ object PhotoStorage extends LoggingCompanion[PhotoStorage] {
         .to[List]
 
     def getPagedWithMeta(page: Int, size: Int): ConnectionIO[List[PhotoMetadata]] =
-      lsql"""SELECT id, name
+      lsql"""SELECT id, latitude, longitude, name, photo_year
               | FROM photo
               | LEFT JOIN metadata 
               | ON photo.id = metadata.photo_id
@@ -94,7 +94,7 @@ object PhotoStorage extends LoggingCompanion[PhotoStorage] {
       lsql"""SELECT id FROM photo""".query[Int].to[List]
 
     def getAllWithMeta: ConnectionIO[List[PhotoMetadata]] =
-      lsql"""SELECT id, name
+      lsql"""SELECT id, latitude, longitude, name, photo_year
                 | FROM photo
                 | LEFT JOIN metadata 
                 | ON photo.id = metadata.photo_id
