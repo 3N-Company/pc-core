@@ -127,7 +127,7 @@ object SubmissionStorage extends LoggingCompanion[SubmissionStorage] {
         .option
 
     def updateSubmissions(photoId: Int, updates: List[UserScore]): ConnectionIO[Unit] = {
-      val sql = """UPDATE submission AS s SET
+      val sql = s"""UPDATE submission AS s SET
               | accepted = n.accepted
               | FROM (VALUES (?, ?))
               | AS n(user_id, accepted)
