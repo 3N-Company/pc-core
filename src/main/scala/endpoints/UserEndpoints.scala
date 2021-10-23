@@ -57,9 +57,20 @@ final class UserEndpoints[F[_]: Monad: UserStorage: SubmissionStorage](
         SubmissionStorage[F].findAllForUser(user).rightIn[StatusCode]
       }
 
+  def getRating =
+    baseEndpoints.secureEndpoint
+      .in("users" / "rating")
+      .out(jsonBody[Int])
+      .serverLogic { case ((user_id, _), _) =>
+        SubmissionStorage[F]
+          .acceptedSubmissionsForUser(user_id)
+          .map(_.getOrElse(0))
+          .map(_.asRight[StatusCode])
+      }
+
   def all: List[
     ServerEndpoint[_, _, _, Fs2Streams[F] with capabilities.WebSockets, F]
   ] =
-    List(users, user, promote, submissions)
+    List(users, user, promote, submissions, getRating)
 
 }
