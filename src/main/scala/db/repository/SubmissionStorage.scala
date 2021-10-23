@@ -2,7 +2,7 @@ package db.repository
 
 import cats.tagless.syntax.functorK._
 import cats.{Apply, Monad}
-import db.models.{PhotoSubmission, Submission, UserSubmission}
+import db.models.{PhotoSubmission, Position, Submission, UserSubmission}
 import derevo.derive
 import doobie.ConnectionIO
 import doobie.postgres.implicits._
@@ -32,6 +32,7 @@ trait SubmissionStorage[F[_]] {
   def countAllForPhoto(photoId: Int): F[Option[Int]]
   def acceptedSubmissionsForUser(userId: UUID): F[Option[Int]]
   def updateSubmissions(photoId: Int, updates: List[UserScore]): F[Unit]
+  def findAllPositions: F[List[Position]]
 }
 
 object SubmissionStorage extends LoggingCompanion[SubmissionStorage] {
@@ -95,6 +96,12 @@ object SubmissionStorage extends LoggingCompanion[SubmissionStorage] {
             |""".stripMargin
         .query[UserSubmission]
         .to[List]
+
+    def findAllPositions: ConnectionIO[List[Position]] =
+      lsql"""SELECT latitude, longitude FROM submission"""
+          .query[Position]
+          .to[List]
+
 
     def countAllForPhoto(photoId: Int): ConnectionIO[Option[Int]] =
         lsql"""SELECT COUNT(*)

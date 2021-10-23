@@ -5,7 +5,7 @@ import cats.effect.{Blocker, ContextShift, Sync}
 import cats.syntax.either._
 import cats.syntax.traverse._
 import common.Config
-import db.models.{PhotoMetadata, Submission, UserSubmission}
+import db.models.{PhotoMetadata, Position, Submission, UserSubmission}
 import db.repository.{MetadataStorage, PhotoStorage, SubmissionStorage, UserPhotoStorage}
 import endpoints.models.PhotoWithSubmissions
 import external.{Colorization, Normalization}
@@ -216,6 +216,14 @@ final class PhotoEndpoints[F[
         } yield photoId.asRight[StatusCode]
       }
 
+  def getAllPositions =
+    baseEndpoints.adminEndpoint.get
+      .in("photo" / "submition" / "positions")
+      .out(jsonBody[List[Position]])
+      .serverLogic { _ =>
+        SubmissionStorage[F].findAllPositions.map(_.asRight[StatusCode])
+      }
+
   def all: List[
     ServerEndpoint[_, _, _, Fs2Streams[F] with capabilities.WebSockets, F]
   ] =
@@ -231,6 +239,7 @@ final class PhotoEndpoints[F[
       getPhoto,
       getPhotoColorized,
       uploadPhoto,
-      getMetadata
+      getMetadata,
+      getAllPositions
     )
 }
