@@ -9,6 +9,16 @@ object Dependencies {
     val all            = Seq(core, doobiePostgres)
   }
 
+  object SttpClient {
+    private val version = "3.3.16"
+
+    val core          = "com.softwaremill.sttp.client3" %% "core"               % version
+    val circe         = "com.softwaremill.sttp.client3" %% "circe"              % version
+    val http4sBackend = "com.softwaremill.sttp.client3" %% "http4s-ce2-backend" % version
+
+    val all = Seq(core, circe, http4sBackend)
+  }
+
   object Postgres {
     private val version = "42.2.24"
 
@@ -91,9 +101,10 @@ object Dependencies {
   object Http4s {
     private val version = "0.22.0"
 
-    val dsl = "org.http4s" %% "http4s-dsl" % version
+    val dsl    = "org.http4s" %% "http4s-dsl"          % version
+    val client = "org.http4s" %% "http4s-blaze-client" % version
 
-    val all = Seq(dsl)
+    val all = Seq(dsl, client)
   }
 
   object Flyway {
@@ -104,5 +115,5 @@ object Dependencies {
 
   val all: Seq[ModuleID] =
     Doobie.all ++ Postgres.all ++ Tofu.all ++ Tapir.all ++ Derevo.all ++
-      Izumi.all ++ Pureconfig.all ++ Http4s.all ++ Flyway.all
+      Izumi.all ++ Pureconfig.all ++ Http4s.all ++ Flyway.all ++ SttpClient.all
 }

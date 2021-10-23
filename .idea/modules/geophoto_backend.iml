@@ -21,12 +21,12 @@
     <orderEntry type="library" name="sbt: cglib:cglib-nodep:3.3.0:jar" level="project" />
     <orderEntry type="library" name="sbt: ch.qos.logback:logback-classic:1.2.6:jar" level="project" />
     <orderEntry type="library" name="sbt: ch.qos.logback:logback-core:1.2.6:jar" level="project" />
-    <orderEntry type="library" name="sbt: co.fs2:fs2-core_2.13:2.5.9:jar" level="project" />
-    <orderEntry type="library" name="sbt: co.fs2:fs2-io_2.13:2.5.9:jar" level="project" />
+    <orderEntry type="library" name="sbt: co.fs2:fs2-core_2.13:2.5.10:jar" level="project" />
+    <orderEntry type="library" name="sbt: co.fs2:fs2-io_2.13:2.5.10:jar" level="project" />
     <orderEntry type="library" name="sbt: com.beachape:enumeratum-macros_2.13:1.6.1:jar" level="project" />
     <orderEntry type="library" name="sbt: com.beachape:enumeratum_2.13:1.7.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.chuusai:shapeless_2.13:2.3.7:jar" level="project" />
-    <orderEntry type="library" name="sbt: com.comcast:ip4s-core_2.13:2.0.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.comcast:ip4s-core_2.13:2.0.4:jar" level="project" />
     <orderEntry type="library" name="sbt: com.fasterxml.jackson.core:jackson-core:2.11.4:jar" level="project" />
     <orderEntry type="library" name="sbt: com.github.pureconfig:pureconfig-cats-effect_2.13:0.13.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.github.pureconfig:pureconfig-core_2.13:0.13.0:jar" level="project" />
@@ -36,10 +36,16 @@
     <orderEntry type="library" name="sbt: com.github.pureconfig:pureconfig_2.13:0.13.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.propensive:magnolia_2.13:0.17.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.propensive:mercator_2.13:0.2.1:jar" level="project" />
-    <orderEntry type="library" name="sbt: com.softwaremill.sttp.model:core_2.13:1.4.9:jar" level="project" />
-    <orderEntry type="library" name="sbt: com.softwaremill.sttp.shared:core_2.13:1.2.5:jar" level="project" />
-    <orderEntry type="library" name="sbt: com.softwaremill.sttp.shared:fs2-ce2_2.13:1.2.5:jar" level="project" />
-    <orderEntry type="library" name="sbt: com.softwaremill.sttp.shared:ws_2.13:1.2.5:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.softwaremill.sttp.client3:catsce2_2.13:3.3.16:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.softwaremill.sttp.client3:circe_2.13:3.3.16:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.softwaremill.sttp.client3:core_2.13:3.3.16:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.softwaremill.sttp.client3:fs2ce2_2.13:3.3.16:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.softwaremill.sttp.client3:http4s-ce2-backend_2.13:3.3.16:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.softwaremill.sttp.client3:json-common_2.13:3.3.16:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.softwaremill.sttp.model:core_2.13:1.4.16:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.softwaremill.sttp.shared:core_2.13:1.2.7:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.softwaremill.sttp.shared:fs2-ce2_2.13:1.2.7:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.softwaremill.sttp.shared:ws_2.13:1.2.7:jar" level="project" />
     <orderEntry type="library" name="sbt: com.softwaremill.sttp.tapir:tapir-apispec-docs_2.13:0.18.3:jar" level="project" />
     <orderEntry type="library" name="sbt: com.softwaremill.sttp.tapir:tapir-apispec-model_2.13:0.18.3:jar" level="project" />
     <orderEntry type="library" name="sbt: com.softwaremill.sttp.tapir:tapir-cats_2.13:0.18.3:jar" level="project" />
@@ -94,9 +100,12 @@
     <orderEntry type="library" name="sbt: org.flywaydb:flyway-core:7.14.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.http4s:blaze-core_2.13:0.15.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.http4s:blaze-http_2.13:0.15.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.http4s:http4s-blaze-client_2.13:0.22.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.http4s:http4s-blaze-core_2.13:0.22.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.http4s:http4s-blaze-server_2.13:0.22.0:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.http4s:http4s-core_2.13:0.22.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.http4s:http4s-client_2.13:0.22.7:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.http4s:http4s-core_2.13:0.22.7:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.http4s:http4s-crypto_2.13:0.1.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.http4s:http4s-dsl_2.13:0.22.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.http4s:http4s-server_2.13:0.22.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.jline:jline:3.19.0:jar" level="project" />
@@ -108,7 +117,7 @@
     <orderEntry type="library" name="sbt: org.scala-lang:scala-compiler:2.13.6:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scala-library:2.13.6:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scala-reflect:2.13.6:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.scodec:scodec-bits_2.13:1.1.27:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scodec:scodec-bits_2.13:1.1.29:jar" level="project" />
     <orderEntry type="library" name="sbt: org.slf4j:slf4j-api:1.7.32:jar" level="project" />
     <orderEntry type="library" name="sbt: org.tpolecat:doobie-core_2.13:0.13.4:jar" level="project" />
     <orderEntry type="library" name="sbt: org.tpolecat:doobie-free_2.13:0.13.4:jar" level="project" />

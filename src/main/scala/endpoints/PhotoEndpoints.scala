@@ -8,6 +8,7 @@ import common.Config
 import db.models.{PhotoMetadata, Submission, UserSubmission}
 import db.repository.{MetadataStorage, PhotoStorage, SubmissionStorage, UserPhotoStorage}
 import endpoints.models.PhotoWithSubmissions
+import external.Normalization
 import sttp.capabilities
 import sttp.capabilities.fs2.Fs2Streams
 import sttp.model.{HeaderNames, MediaType, StatusCode}
@@ -23,7 +24,7 @@ import java.nio.file.{Path, StandardOpenOption}
 
 final class PhotoEndpoints[F[
     _
-]: Monad: PhotoStorage: SubmissionStorage: UserPhotoStorage: MetadataStorage: Sync: ContextShift: GenUUID](
+]: Monad: PhotoStorage: SubmissionStorage: UserPhotoStorage: MetadataStorage: Sync: ContextShift: GenUUID: Normalization](
     baseEndpoints: BaseEndpoints[F],
     blocker: Blocker,
     config: Config
@@ -50,6 +51,7 @@ final class PhotoEndpoints[F[
       .serverLogic { case ((user, _), (id, submission)) =>
         SubmissionStorage[F]
           .create(id, user, submission)
+          .flatMap(_ => Normalization[F].maybeNormalizeAndSave(id))
           .map(_.asRight[StatusCode])
       }
 

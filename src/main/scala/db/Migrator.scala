@@ -10,7 +10,7 @@ final class Migrator[F[_]: Sync](trans: Transactor[F], config: Config) {
     Sync[F].delay {
       val flyway = Flyway
         .configure()
-        .dataSource(config.dbConnectionString, config.dbUser, config.dbPass)
+        .dataSource(config.db.connectionString, config.db.user, config.db.pass)
         .load()
       flyway.migrate()
       ()

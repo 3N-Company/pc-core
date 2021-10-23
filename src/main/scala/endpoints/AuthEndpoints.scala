@@ -22,13 +22,7 @@ final class AuthEndpoints[F[_]: Monad: UserStorage: SessionStorage](
     baseEndpoints: BaseEndpoints[F]
 ) extends EndpointsModule[F] {
 
-  val login: ServerEndpoint[
-    UsernamePassword,
-    StatusCode,
-    SetCookie,
-    Any,
-    F
-  ] =
+  val login =
     endpoint.post
       .in("login")
       .in(
@@ -37,8 +31,8 @@ final class AuthEndpoints[F[_]: Monad: UserStorage: SessionStorage](
         )
       )
       //workaround - frontend bug
-        .out(jsonBody[SetCookie])
-      //.out(setCookie(BaseEndpoints.authCookie))
+         .out(jsonBody[SetCookie])
+      .out(setCookie(BaseEndpoints.authCookie))
       .errorOut(statusCode)
       .serverLogic { credentials =>
         credentials.password
@@ -49,8 +43,7 @@ final class AuthEndpoints[F[_]: Monad: UserStorage: SessionStorage](
             SessionStorage[F]
               .createSessionCookie(uuid)
               .map(_.toRight(StatusCode.InternalServerError))
-              //.mapIn(x => CookieValueWithMeta.unsafeApply(value = x))
-                .mapIn(SetCookie(BaseEndpoints.authCookie, _))
+              .mapIn(x => (SetCookie(BaseEndpoints.authCookie, x), CookieValueWithMeta.unsafeApply(value = x)))
           }
       }
 

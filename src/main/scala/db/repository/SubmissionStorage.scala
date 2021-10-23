@@ -7,6 +7,8 @@ import derevo.derive
 import doobie.ConnectionIO
 import doobie.postgres.implicits._
 import doobie.util.log.LogHandler
+import doobie.util.update.Update
+import external.models.UserScore
 import izumi.distage.model.definition.Lifecycle
 import izumi.fundamentals.platform.functional.Identity
 import tofu.Tries
@@ -27,6 +29,9 @@ trait SubmissionStorage[F[_]] {
   def find(photoId: Int, userID: UUID): F[Option[Submission]]
   def findAllForUser(userId: UUID): F[List[PhotoSubmission]]
   def findAllForPhoto(photoId: Int): F[List[UserSubmission]]
+  def countAllForPhoto(photoId: Int): F[Option[Int]]
+  def acceptedSubmissionsForUser(userId: UUID): F[Option[Int]]
+  def updateSubmissions(photoId: Int, updates: List[UserScore]): F[Unit]
 }
 
 object SubmissionStorage extends LoggingCompanion[SubmissionStorage] {
@@ -59,14 +64,19 @@ object SubmissionStorage extends LoggingCompanion[SubmissionStorage] {
         userId: UUID,
         metadata: Submission
     ): ConnectionIO[Unit] =
-      lsql"""INSERT INTO submission(photo_id, user_id, latitude, longitude, name, photoYear) VALUES(
+      lsql"""INSERT INTO submission(photo_id, user_id, latitude, longitude, name, photo_year) VALUES(
             |$photoId,
             |$userId,
             |${metadata.position.map(_.latitude)},
             |${metadata.position.map(_.longitude)},
             |${metadata.name},
             |${metadata.photoYear}
-            |) ON CONFLICT (photo_id, user_id) DO UPDATE SET name = ${metadata.name}""".stripMargin.update.run.void
+            |) ON CONFLICT (photo_id, user_id) DO UPDATE SET
+            | latitude = ${metadata.position.map(_.latitude)},
+            | longitude = ${metadata.position.map(_.longitude)},
+            | name = ${metadata.name},
+            | photo_year = ${metadata.photoYear}
+            | """.stripMargin.update.run.void
 
     def find(photoId: Int, userId: UUID): ConnectionIO[Option[Submission]] =
       lsql"""SELECT latitude, longitude, name, photoYear
@@ -86,6 +96,16 @@ object SubmissionStorage extends LoggingCompanion[SubmissionStorage] {
         .query[UserSubmission]
         .to[List]
 
+    def countAllForPhoto(photoId: Int): ConnectionIO[Option[Int]] =
+        lsql"""SELECT COUNT(*)
+              |FROM submission
+              |WHERE photo_id = $photoId
+              |"""
+            .stripMargin
+            .query[Int]
+            .option
+
+
     def findAllForUser(userId: UUID): ConnectionIO[List[PhotoSubmission]] =
       lsql"""SELECT photo_id, latitude, longitude, name, photoYear
             |FROM submission
@@ -95,6 +115,30 @@ object SubmissionStorage extends LoggingCompanion[SubmissionStorage] {
             |""".stripMargin
         .query[PhotoSubmission]
         .to[List]
+
+    def acceptedSubmissionsForUser(userId: UUID): ConnectionIO[Option[Int]] =
+      lsql"""SELECT COUNT(*)
+                |FROM submission
+                |WHERE
+                | user_id = $userId
+                | AND
+                | accepted = true""".stripMargin
+        .query[Int]
+        .option
+
+    def updateSubmissions(photoId: Int, updates: List[UserScore]): ConnectionIO[Unit] = {
+      val sql = """UPDATE submission AS s SET
+              | accepted = n.accepted
+              | VALUES (?, ?)
+              | AS n(user_id, accepted)
+              | WHERE
+              |     s.photo_id = ${photoId}
+              |     AND s.user_id = n.user_id
+              |""".stripMargin
+
+      Update[UserScore](sql).updateMany[List](updates).void
+
+    }
 
   }
 }

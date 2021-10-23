@@ -20,9 +20,9 @@ object DB {
     make[Transactor[F]].from { config: Config =>
       Transactor.fromDriverManager[F](
         driver = "org.postgresql.Driver",
-        url = config.dbConnectionString,
-        user = config.dbUser,
-        pass = config.dbPass
+        url = config.db.connectionString,
+        user = config.db.user,
+        pass = config.db.pass
       )
     }
 

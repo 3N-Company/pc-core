@@ -3,15 +3,27 @@ package common
 import cats.effect.{Blocker, ContextShift, Sync}
 import distage._
 import pureconfig._
-import pureconfig.generic.auto._
 import pureconfig.module.catseffect.syntax._
+import pureconfig.generic.auto._
+
+case class Normalization(
+    host: String,
+    port: String,
+    path: String,
+    threshold: Int
+                        )
+
+case class DB(
+    connectionString: String,
+    user: String,
+    pass: String
+             )
 
 case class Config(
-    dbConnectionString: String,
-    dbUser: String,
-    dbPass: String,
+    db: DB,
     serverPort: Int,
-    photoFolder: String
+    photoFolder: String,
+    normalization: Normalization
 )
 
 object Config {

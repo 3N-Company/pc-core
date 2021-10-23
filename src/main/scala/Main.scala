@@ -1,13 +1,16 @@
-import cats.Monad
+import cats.{Monad, MonadError}
 import cats.effect.{Blocker, ConcurrentEffect, ContextShift, ExitCode, IO, IOApp, Sync}
 import common.Config
 import db.{DB, Migrator, PhotoInit}
 import distage._
 import endpoints.{Endpoints, EndpointsModule}
+import external.External
 import org.http4s.blaze.server.BlazeServerBuilder
 import org.http4s.implicits._
 import org.http4s.server.Router
 import org.http4s.server.middleware.CORS
+import sttp.client3.SttpBackend
+import sttp.client3.http4s.Http4sBackend
 import sttp.tapir.docs.openapi.OpenAPIDocsInterpreter
 import sttp.tapir.openapi.circe.yaml._
 import sttp.tapir.server.http4s._
@@ -15,7 +18,7 @@ import sttp.tapir.swagger.http4s.SwaggerHttp4s
 import tofu.doobie.{ConnectionCIO, LiftConnectionIO}
 import tofu.generate.GenUUID
 import tofu.lift.UnliftIO
-import tofu.{Delay, Tries}
+import tofu.{Delay, Fire, Raise, Tries}
 
 import scala.concurrent.ExecutionContext
 
@@ -55,12 +58,18 @@ object Main extends IOApp {
     CommonModule[F] ++
       Config.Module[F] ++
       DB.Module[F, DB] ++
-      Endpoints.Module[F]
+      Endpoints.Module[F] ++
+      External.Module[F]
   }
 
-  def CommonModule[F[_]: TagK: Delay: Sync]: ModuleDef = new ModuleDef {
+  def CommonModule[F[_]: TagK: Delay: Sync: ConcurrentEffect: ContextShift: MonadError[*[_], Throwable]: Fire]: ModuleDef = new ModuleDef {
     make[GenUUID[F]].from(GenUUID.syncGenUUID[F])
     make[Blocker].fromResource(Blocker[F])
+    make[SttpBackend[F, Any]].fromResource{ blocker: Blocker =>
+        Http4sBackend.usingDefaultBlazeClientBuilder[F](blocker)
+    }
+    make[Raise[F, Throwable]].from(implicitly[Raise[F, Throwable]])
+    make[Fire[F]].from(implicitly[Fire[F]])
   }
 
   override def run(args: List[String]): IO[ExitCode] =
