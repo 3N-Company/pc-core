@@ -8,7 +8,7 @@ import pureconfig.generic.auto._
 
 case class Normalization(
     host: String,
-    port: String,
+    port: Int,
     path: String,
     threshold: Int
                         )
