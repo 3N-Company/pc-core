@@ -13,6 +13,12 @@ case class Normalization(
     threshold: Int
                         )
 
+case class Colorization(
+    host: String,
+    port: Int,
+    path: String
+                       )
+
 case class DB(
     connectionString: String,
     user: String,
@@ -23,7 +29,8 @@ case class Config(
     db: DB,
     serverPort: Int,
     photoFolder: String,
-    normalization: Normalization
+    normalization: Normalization,
+    colorization: Colorization
 )
 
 object Config {

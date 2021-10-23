@@ -8,7 +8,7 @@ import common.Config
 import db.models.{PhotoMetadata, Submission, UserSubmission}
 import db.repository.{MetadataStorage, PhotoStorage, SubmissionStorage, UserPhotoStorage}
 import endpoints.models.PhotoWithSubmissions
-import external.Normalization
+import external.{Colorization, Normalization}
 import sttp.capabilities
 import sttp.capabilities.fs2.Fs2Streams
 import sttp.model.{HeaderNames, MediaType, StatusCode}
@@ -24,13 +24,15 @@ import java.nio.file.{Path, StandardOpenOption}
 
 final class PhotoEndpoints[F[
     _
-]: Monad: PhotoStorage: SubmissionStorage: UserPhotoStorage: MetadataStorage: Sync: ContextShift: GenUUID: Normalization](
+]: Monad: PhotoStorage: SubmissionStorage: UserPhotoStorage: MetadataStorage: Sync: ContextShift: GenUUID: Normalization: Colorization](
     baseEndpoints: BaseEndpoints[F],
     blocker: Blocker,
     config: Config
 ) extends EndpointsModule[F] {
 
   val pathPrefix = config.photoFolder + "/"
+
+  val colorizedPrefix = config.photoFolder + "/colorised/"
 
   val allSumbissions =
     baseEndpoints.secureEndpoint.get
@@ -158,7 +160,29 @@ final class PhotoEndpoints[F[
           .find(photoId)
           .map(_.toRight(StatusCode.NotFound))
           .doubleFlatMap { pathStr =>
-            val path = Path.of(pathStr)
+            val path = Path.of(pathPrefix ++ pathStr)
+            fs2.io.file.size(blocker, path).map { size =>
+              val stream = fs2.io.file.readAll(path, blocker, 10 * 1024 * 1024)
+              (size, stream).asRight[StatusCode]
+            }
+          }
+      }
+
+  val getPhotoColorized =
+    endpoint.get
+      .in("photo")
+      .in(path[Int])
+      .in("colorized")
+      .out(header[Long](HeaderNames.ContentLength))
+      .out(header(HeaderNames.ContentType, MediaType.ImageJpeg.toString))
+      .out(streamBinaryBody(Fs2Streams[F]))
+      .errorOut(statusCode)
+      .serverLogic { photoId =>
+        PhotoStorage[F]
+          .find(photoId)
+          .map(_.toRight(StatusCode.NotFound))
+          .doubleFlatMap { pathStr =>
+            val path = Path.of(colorizedPrefix ++ pathStr)
             fs2.io.file.size(blocker, path).map { size =>
               val stream = fs2.io.file.readAll(path, blocker, 10 * 1024 * 1024)
               (size, stream).asRight[StatusCode]
@@ -187,7 +211,8 @@ final class PhotoEndpoints[F[
                        flags = Seq(StandardOpenOption.CREATE)
                      )
           _       <- stream.through(write).compile.drain
-          photoId <- PhotoStorage[F].insert(path.toString)
+          photoId <- PhotoStorage[F].insert(name.toString)
+          _       <- Colorization[F].colorize(name.toString)
         } yield photoId.asRight[StatusCode]
       }
 
@@ -204,6 +229,7 @@ final class PhotoEndpoints[F[
       photosPaged,
       photosPagedWithMeta,
       getPhoto,
+      getPhotoColorized,
       uploadPhoto,
       getMetadata
     )
