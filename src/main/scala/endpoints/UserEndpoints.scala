@@ -58,7 +58,7 @@ final class UserEndpoints[F[_]: Monad: UserStorage: SubmissionStorage](
       }
 
   val getRating =
-    baseEndpoints.secureEndpoint
+    baseEndpoints.secureEndpoint.get
       .in("users" / "rating")
       .out(jsonBody[Int])
       .serverLogic { case ((user_id, _), _) =>
