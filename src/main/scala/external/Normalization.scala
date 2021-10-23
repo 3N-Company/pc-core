@@ -26,7 +26,7 @@ final class Normalization[F[_]: Monad: MetadataStorage: SubmissionStorage: Raise
 
   def normalize(submissions: List[UserSubmission]): F[NormalizationResult] =
     basicRequest
-      .get(baseUri.addPath(config.normalization.path))
+      .post(baseUri.addPath(config.normalization.path))
       .body(submissions)
       .response(asJson[NormalizationResult])
       .send(sttpBackend)
