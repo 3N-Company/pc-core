@@ -55,6 +55,17 @@ final class PhotoEndpoints[F[
           .map(_.asRight[StatusCode])
       }
 
+  val getMetadata =
+    endpoint.get
+      .in("photo")
+      .in(path[Int])
+      .in("metadata")
+      .out(jsonBody[Submission])
+      .errorOut(statusCode)
+      .serverLogic { id =>
+        MetadataStorage[F].find(id).toRightIn(StatusCode.NotFound)
+      }
+
   val nextPhoto =
     baseEndpoints.secureEndpoint.get
       .in("photo" / "next")
@@ -193,6 +204,7 @@ final class PhotoEndpoints[F[
       photosPaged,
       photosPagedWithMeta,
       getPhoto,
-      uploadPhoto
+      uploadPhoto,
+      getMetadata
     )
 }

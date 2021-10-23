@@ -16,6 +16,7 @@ services:
       SERVER-PORT: 8080
       PHOTO-FOLDER: "/data"
       NORMALIZATION-HOST: "normalization"
+      NORMALIZATION-THRESHOLD: 3
     ports:
       - "8080:8080"
     volumes:
