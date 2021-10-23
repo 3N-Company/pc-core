@@ -18,6 +18,7 @@ import sttp.tapir.swagger.http4s.SwaggerHttp4s
 import tofu.doobie.{ConnectionCIO, LiftConnectionIO}
 import tofu.generate.GenUUID
 import tofu.lift.UnliftIO
+import tofu.logging.Logging
 import tofu.{Delay, Fire, Raise, Tries}
 
 import scala.concurrent.ExecutionContext
@@ -70,6 +71,7 @@ object Main extends IOApp {
     }
     make[Raise[F, Throwable]].from(implicitly[Raise[F, Throwable]])
     make[Fire[F]].from(implicitly[Fire[F]])
+    make[Logging.Make[F]].from(Logging.Make.plain[F])
   }
 
   override def run(args: List[String]): IO[ExitCode] =
