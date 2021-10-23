@@ -79,7 +79,7 @@ object SubmissionStorage extends LoggingCompanion[SubmissionStorage] {
             | """.stripMargin.update.run.void
 
     def find(photoId: Int, userId: UUID): ConnectionIO[Option[Submission]] =
-      lsql"""SELECT latitude, longitude, name, photoYear
+      lsql"""SELECT latitude, longitude, name, photo_year
             |FROM submission
             |WHERE photo_id = $photoId AND user_id = $userId
             |""".stripMargin
@@ -87,7 +87,7 @@ object SubmissionStorage extends LoggingCompanion[SubmissionStorage] {
         .option
 
     def findAllForPhoto(photoId: Int): ConnectionIO[List[UserSubmission]] =
-      lsql"""SELECT user_id, username, u_role, latitude, longitude, name, photoYear
+      lsql"""SELECT user_id, username, u_role, latitude, longitude, name, photo_year
             |FROM submission
             |JOIN users
             |ON user_id = users.id
@@ -107,7 +107,7 @@ object SubmissionStorage extends LoggingCompanion[SubmissionStorage] {
 
 
     def findAllForUser(userId: UUID): ConnectionIO[List[PhotoSubmission]] =
-      lsql"""SELECT photo_id, latitude, longitude, name, photoYear
+      lsql"""SELECT photo_id, latitude, longitude, name, photo_year
             |FROM submission
             |JOIN photo
             |ON photo_id = photo.id
