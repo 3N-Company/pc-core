@@ -53,7 +53,7 @@ object MetadataStorage extends LoggingCompanion[MetadataStorage] {
         photoId: Int,
         metadata: Submission
     ): ConnectionIO[Unit] =
-      lsql"""INSERT INTO metadata(photo_id, latitude, longitude, name, photoYear) VALUES(
+      lsql"""INSERT INTO metadata(photo_id, latitude, longitude, name, photo_year) VALUES(
                   |$photoId,
                   |${metadata.position.map(_.latitude)}
                   |${metadata.position.map(_.longitude)}
@@ -63,11 +63,11 @@ object MetadataStorage extends LoggingCompanion[MetadataStorage] {
                   |  latitude = ${metadata.position.map(_.latitude)},
                   |  longitude = ${metadata.position.map(_.longitude)}
                   |  name = ${metadata.name},
-                  |  photoYear = ${metadata.photoYear}
+                  |  photo_year = ${metadata.photoYear}
                   |  """.stripMargin.update.run.void
 
     def find(photoId: Int): ConnectionIO[Option[Submission]] =
-      lsql"""SELECT latitude, longitude, name, photoYear
+      lsql"""SELECT latitude, longitude, name, photo_year
                   |FROM metadata
                   |WHERE photo_id = $photoId
                   |""".stripMargin
