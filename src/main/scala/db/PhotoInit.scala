@@ -16,7 +16,7 @@ final class PhotoInit[F[_]: Sync: ContextShift: PhotoStorage: Colorization: Fire
   def paths: F[List[String]] = fs2.io.file
     .directoryStream[F](blocker, Path.of(config.photoFolder))
       .map(_.getFileName)
-      .filter(x => x.toString != "/data/colorised")
+      .filter(x => x.toString != "colorised")
     .map(_.toString)
     .compile
     .toList
