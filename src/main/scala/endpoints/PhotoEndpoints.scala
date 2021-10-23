@@ -217,7 +217,7 @@ final class PhotoEndpoints[F[
       }
 
   def getAllPositions =
-    baseEndpoints.adminEndpoint.get
+    baseEndpoints.secureEndpoint.get
       .in("photo" / "submition" / "positions")
       .out(jsonBody[List[Position]])
       .serverLogic { _ =>
