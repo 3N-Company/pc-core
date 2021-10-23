@@ -57,7 +57,7 @@ final class UserEndpoints[F[_]: Monad: UserStorage: SubmissionStorage](
         SubmissionStorage[F].findAllForUser(user).rightIn[StatusCode]
       }
 
-  def getRating =
+  val getRating =
     baseEndpoints.secureEndpoint
       .in("users" / "rating")
       .out(jsonBody[Int])
