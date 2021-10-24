@@ -18,6 +18,7 @@ final class PhotoInit[F[_]: Sync: ContextShift: PhotoStorage: Colorization: Fire
       .map(_.getFileName)
       .map(_.toString)
       .filter(_ != "colorised")
+      .filter(_ != "upscaled")
     .compile
     .toList
 
