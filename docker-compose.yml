@@ -8,7 +8,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgres/data
   app:
-    image: ghcr.io/3n-company/geophoto_backend:latest
+    image: ghcr.io/3n-company/pc-core:latest
     environment:
       DB-CONNECTION-STRING: "jdbc:postgresql://postgres:5432/"
       DB-USER: "postgres"
