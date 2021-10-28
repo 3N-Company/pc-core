@@ -17,7 +17,7 @@ scalacOptions ++= ScalaOpts.all
 
 dockerRepository := Some("""ghcr.io""")
 
-packageName := "3n-company/geophoto_backend"
+packageName := "3n-company/pc-core"
 
 dockerBaseImage := "adoptopenjdk:11-jre-hotspot"
 
