@@ -61,13 +61,12 @@ object UserStorage extends LoggingCompanion[UserStorage] {
       lsql"""INSERT INTO users (username, password) VALUES (
             |  ${credentials.username},
             |  crypt(${credentials.password}, gen_salt('bf'))
-            |)""".stripMargin
-          .update
+            |)""".stripMargin.update
         .withUniqueGeneratedKeys[UUID]("id")
-          .attemptSomeSqlState {
-              case sqlstate.class23.UNIQUE_VIOLATION => ()
-          }.map(_.toOption)
-
+        .attemptSomeSqlState { case sqlstate.class23.UNIQUE_VIOLATION =>
+          ()
+        }
+        .map(_.toOption)
 
     def findId(credentials: Credentials): ConnectionIO[Option[UUID]] =
       lsql"""SELECT id

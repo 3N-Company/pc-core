@@ -99,19 +99,16 @@ object SubmissionStorage extends LoggingCompanion[SubmissionStorage] {
 
     def findAllPositions: ConnectionIO[List[Position]] =
       lsql"""SELECT latitude, longitude FROM submission"""
-          .query[Position]
-          .to[List]
-
+        .query[Position]
+        .to[List]
 
     def countAllForPhoto(photoId: Int): ConnectionIO[Option[Int]] =
-        lsql"""SELECT COUNT(*)
+      lsql"""SELECT COUNT(*)
               |FROM submission
               |WHERE photo_id = $photoId
-              |"""
-            .stripMargin
-            .query[Int]
-            .option
-
+              |""".stripMargin
+        .query[Int]
+        .option
 
     def findAllForUser(userId: UUID): ConnectionIO[List[PhotoSubmission]] =
       lsql"""SELECT photo_id, latitude, longitude, name, photo_year

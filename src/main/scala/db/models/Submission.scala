@@ -14,7 +14,7 @@ case class Submission(position: Option[Position] = None, name: Option[String] = 
 
 object Submission {
   def fromNormalized(normalizationResult: NormalizationResult): Submission =
-      Submission(position = Some(normalizationResult.mean))
+    Submission(position = Some(normalizationResult.mean))
 }
 
 @derive(loggable, encoder, decoder, schema)

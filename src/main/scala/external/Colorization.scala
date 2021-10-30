@@ -15,7 +15,9 @@ import tofu.logging.Logging
 import tofu.{Fire, Raise}
 import tofu.syntax.monadic._
 
-final class Colorization[F[_]: Monad: MetadataStorage: SubmissionStorage: Raise[*[_], Throwable]: Fire: Logging.Make: Sync](
+final class Colorization[
+    F[_]: Monad: MetadataStorage: SubmissionStorage: Raise[*[_], Throwable]: Fire: Logging.Make: Sync
+](
     sttpBackend: SttpBackend[F, Any],
     config: Config
 ) {
@@ -29,13 +31,13 @@ final class Colorization[F[_]: Monad: MetadataStorage: SubmissionStorage: Raise[
 
   def colorize(file: String): F[Unit] =
     basicRequest
-        .post(baseUri.addPath(config.colorization.path))
-        .body(ColorizeRequest(file))
-        .send(sttpBackend)
-        .flatMap{ x =>
-            Sync[F].delay(println(x))
-        }
-        .void
+      .post(baseUri.addPath(config.colorization.path))
+      .body(ColorizeRequest(file))
+      .send(sttpBackend)
+      .flatMap { x =>
+        Sync[F].delay(println(x))
+      }
+      .void
 
 }
 
