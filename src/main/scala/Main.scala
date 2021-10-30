@@ -27,7 +27,7 @@ object Main extends IOApp {
 
   implicit val ec: ExecutionContext =
     scala.concurrent.ExecutionContext.Implicits.global
-  //dirty
+  // dirty
 
   def app(locator: Locator): IO[Unit] =
     for {
@@ -63,11 +63,12 @@ object Main extends IOApp {
       External.Module[F]
   }
 
-  def CommonModule[F[_]: TagK: Delay: Sync: ConcurrentEffect: ContextShift: MonadError[*[_], Throwable]: Fire]: ModuleDef = new ModuleDef {
+  def CommonModule[F[_]: TagK: Delay: Sync: ConcurrentEffect: ContextShift: MonadError[*[_], Throwable]: Fire]
+      : ModuleDef = new ModuleDef {
     make[GenUUID[F]].from(GenUUID.syncGenUUID[F])
     make[Blocker].fromResource(Blocker[F])
-    make[SttpBackend[F, Any]].fromResource{ blocker: Blocker =>
-        Http4sBackend.usingDefaultBlazeClientBuilder[F](blocker)
+    make[SttpBackend[F, Any]].fromResource { blocker: Blocker =>
+      Http4sBackend.usingDefaultBlazeClientBuilder[F](blocker)
     }
     make[Raise[F, Throwable]].from(implicitly[Raise[F, Throwable]])
     make[Fire[F]].from(implicitly[Fire[F]])

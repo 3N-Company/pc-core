@@ -30,8 +30,8 @@ final class AuthEndpoints[F[_]: Monad: UserStorage: SessionStorage](
           WWWAuthenticate.basic(WWWAuthenticate.DefaultRealm)
         )
       )
-      //workaround - frontend bug
-         .out(jsonBody[SetCookie])
+      // workaround - frontend bug
+      .out(jsonBody[SetCookie])
       .out(setCookie(BaseEndpoints.authCookie))
       .errorOut(statusCode)
       .serverLogic { credentials =>
@@ -73,7 +73,7 @@ final class AuthEndpoints[F[_]: Monad: UserStorage: SessionStorage](
         UserStorage[F]
           .create(credentials)
           .toRightIn(StatusCode.Conflict)
-            .mapIn(_ => ())
+          .mapIn(_ => ())
       }
 
   override def all: List[

@@ -31,9 +31,9 @@ final class Normalization[F[_]: Monad: MetadataStorage: SubmissionStorage: Raise
       .response(asJson[NormalizationResult])
       .send(sttpBackend)
       .map(_.body)
-        .leftMapF{ err =>
-            error"${err.getMessage}".map(_ => err)
-        }
+      .leftMapF { err =>
+        error"${err.getMessage}".map(_ => err)
+      }
       .reRaise
 
   def normalizeAndSave(photoId: Int): F[Unit] =

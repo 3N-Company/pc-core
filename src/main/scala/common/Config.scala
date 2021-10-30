@@ -11,19 +11,19 @@ case class Normalization(
     port: Int,
     path: String,
     threshold: Int
-                        )
+)
 
 case class Colorization(
     host: String,
     port: Int,
     path: String
-                       )
+)
 
 case class DB(
     connectionString: String,
     user: String,
     pass: String
-             )
+)
 
 case class Config(
     db: DB,

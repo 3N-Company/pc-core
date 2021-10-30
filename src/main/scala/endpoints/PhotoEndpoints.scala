@@ -192,27 +192,27 @@ final class PhotoEndpoints[F[
           }
       }
 
-    val getPhotoUpscaled =
-        endpoint.get
-            .in("photo")
-            .in(path[Int])
-            .in("upscaled")
-            .out(header[Long](HeaderNames.ContentLength))
-            .out(header(HeaderNames.ContentType, MediaType.ImageJpeg.toString))
-            .out(streamBinaryBody(Fs2Streams[F]))
-            .errorOut(statusCode)
-            .serverLogic { photoId =>
-                PhotoStorage[F]
-                    .find(photoId)
-                    .map(_.toRight(StatusCode.NotFound))
-                    .doubleFlatMap { pathStr =>
-                        val path = Path.of(upscaledPrefix ++ pathStr)
-                        fs2.io.file.size(blocker, path).map { size =>
-                            val stream = fs2.io.file.readAll(path, blocker, 10 * 1024 * 1024)
-                            (size, stream).asRight[StatusCode]
-                        }
-                    }
+  val getPhotoUpscaled =
+    endpoint.get
+      .in("photo")
+      .in(path[Int])
+      .in("upscaled")
+      .out(header[Long](HeaderNames.ContentLength))
+      .out(header(HeaderNames.ContentType, MediaType.ImageJpeg.toString))
+      .out(streamBinaryBody(Fs2Streams[F]))
+      .errorOut(statusCode)
+      .serverLogic { photoId =>
+        PhotoStorage[F]
+          .find(photoId)
+          .map(_.toRight(StatusCode.NotFound))
+          .doubleFlatMap { pathStr =>
+            val path = Path.of(upscaledPrefix ++ pathStr)
+            fs2.io.file.size(blocker, path).map { size =>
+              val stream = fs2.io.file.readAll(path, blocker, 10 * 1024 * 1024)
+              (size, stream).asRight[StatusCode]
             }
+          }
+      }
 
   val uploadPhoto: ServerEndpoint[
     (Option[String], fs2.Stream[F, Byte]),
