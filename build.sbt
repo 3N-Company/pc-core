@@ -31,4 +31,4 @@ ThisBuild / semanticdbEnabled := true
 
 ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
 
-ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.5.0"
+ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.6.0"
